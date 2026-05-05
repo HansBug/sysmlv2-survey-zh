@@ -53,6 +53,9 @@
 ### 2.5 北航与中文学术
 
 - <a id="zhang-2026-uncertainty"></a>**[zhang-2026-uncertainty]** Zhang, M., Li, Y., & Yue, T. (2026). *Uncertainty Modeling for SysML v2*. arXiv:2602.21641. 三作者邮箱均为 `@buaa.edu.cn`。<https://arxiv.org/abs/2602.21641>
+- <a id="repo-psum-sysmlv2"></a>**[repo-psum-sysmlv2]** WSE-Laboratory. *PSUM-SysMLv2*——arXiv 2602.21641 的配套 artifact，含 7 个工业域案例（Adaptive Cruise Control / Camera / 等）。<https://github.com/WSE-Laboratory/PSUM-SysMLv2>
+- <a id="gb-45803"></a>**[gb-45803]** *GB/T 45803-2025 系统与软件工程 基于模型的系统工程 统一架构建模语言*. 国家市场监督管理总局 / 国家标准化管理委员会，**2025-05-30 发布，2025-12-01 实施**。起草单位含**北京航空航天大学（鲁金直为核心起草人）**、北京理工大学、中国电子技术标准化研究院、商飞、兵器、航天等 16 家。<https://www.ndls.org.cn/standard/detail/28c9f842f8a22c6a6fee666390d8b1c0> · SAMR <https://std.samr.gov.cn/gb/search/gbDetailed?id=DF55C2967EADD24BE05397BE0A0A5C25>
+- <a id="mbse-copilot-loughborough"></a>**[mbse-copilot-loughborough]** Wenheng Zhang 等 (Loughborough University). *MBSE Co-Pilot: A Research Roadmap*. INCOSE *Systems Engineering* 29(1):20-33 (2026), DOI 10.1002/sys.70011. **与北航 ModelCopilot 同名同题但完全无关**——前者是 vision-only 路线图论文，没有平台没有代码；后者是 vision + 平台 + profile + 案例 + 多个工具的"做实型"路径。<https://incose.onlinelibrary.wiley.com/doi/10.1002/sys.70011>
 - <a id="yue-traceability-2014"></a>**[yue-traceability-2014]** Yue, T. *et al.* (2014). *Traceability and SysML Design Slices to Support Safety Inspection*. ACM TOSEM. <https://research.buaa.edu.cn/en/publications/traceability-and-sysml-design-slices-to-support-safety-inspection/>
 - <a id="mbse-bibliometric-2026"></a>**[mbse-bibliometric-2026]** *MBSE 文献计量综述（2026）*。ScienceDirect. <https://www.sciencedirect.com/science/article/pii/S2950550X26000014>
 - <a id="yue-tao-homepage"></a>**[yue-tao-homepage]** Yue, Tao. *Personal Homepage*（含 OMG SysML v2 standardisation contributor、PSUM co-chair 自述）。<https://yue-tao.github.io/>
@@ -175,6 +178,7 @@
 - <a id="vendor-vp-sysmlv2"></a>**[vendor-vp-sysmlv2]** Visual Paradigm. *SysML v2 Studio*. <https://updates.visual-paradigm.com/releases/sysml-v2-studio-competitive-advantages-launch/>
 - <a id="webel-sysmlv2"></a>**[webel-sysmlv2]** Webel. *SysML v2 资源汇总*. <https://www.webel.com.au/sysml/sysmlv2>
 - <a id="vendor-modelcopilot-platform"></a>**[vendor-modelcopilot-platform]** WSE-Laboratory (BUAA). *ModelCopilot Platform* — 闭源 Web SPA，平台代码暂未开源（仓库 `WSE-Laboratory/WSE-ModelCopilot` 截至 2026-05-05 仍为占位状态）。HTTP-only 部署位于 `http://116.204.36.247`，对外开放注册。前端为 Vue 3 + Element Plus（bundle `index-DrCKs0sc.js`，1.17 MB），后端为 Spring Boot + MongoDB；可视化引擎为 PlantUML（base64 SVG）。本快照采样于 2026-05-05；详细实测见 [docs/13](13-modelcopilot-platform-walkthrough.md)。
+- <a id="vendor-mdesign"></a>**[vendor-mdesign]** 杭州华望系统科技有限公司. *M-Design v2 alpha* — 国内**唯一公开商用化**的 SysML v2 平台，2025-09-14 发布。是国家标准 GB/T 45803-2025 商业落地的代表产品。详见 docs/00 §5 时间节点条目。
 
 ## 6 同类建模语言基础设施（baseline 对照）
 

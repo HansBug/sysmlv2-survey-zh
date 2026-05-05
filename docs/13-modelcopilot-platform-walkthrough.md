@@ -800,7 +800,173 @@ i18n 字典里有完整的 `editor.format / close / closeOthers / closeAll` 套�
 - `Open AI Assistant` / `Switch to Diagram` / `Auto Completion` / `编辑器右键 Format / Close / Close Others / Close All`
 - 推断为产品规划但未上线的占位翻译。
 
-## 13 与本仓其他章节的交叉引用
+## 13 总结与研判：现状画像 / 进度 / 路线图 / 战略定位
+
+> 本节把 docs/12（学术档案）+ 本章前 12 节（实测）+ Pilot 取证（§6）的证据汇总成一个对 ModelCopilot 项目的**整体研判**，回答四个问题：
+> 1. **它现在到底是什么？**（§13.1 三层画像）
+> 2. **进度走到哪了？**（§13.2 5 维成熟度）
+> 3. **接下来大概率会干什么？**（§13.3 三时间窗预测）
+> 4. **它在大棋局里的位置？**（§13.4 战略定位）
+
+### 13.1 三层画像：技术 / 项目 / 学术
+
+#### 技术层（"它是什么样的工程系统"）
+
+ModelCopilot 是 **OMG Pilot Implementation 的 Java 编译/可视化内核 + Spring Boot REST 包装 + MongoDB 项目存储 + Vue 3 + Element Plus 前端 SPA + （计划中的）PSUM 扩展和 AI Copilot 入口** 的混合体。本质是一个**给学术展示用的、跑在裸 IP HTTP 上、Pilot 内核之上加了一层用户可访问 Web UI 的 alpha 平台**。
+
+- **核心能力 ≈ Pilot Implementation**：解析、AST 构建、PlantUML 渲染、KerML/SysMLv2 双 mode、7 种视图分类——全部继承自 Pilot（§6 六类铁证）。
+- **平台增量 = 中文 UI 壳层 + 项目存储 + PSUM toggle UI**：Vue + ElementPlus 重写的多 pane IDE（约 5000–10000 行 JS/Vue）+ Spring Boot REST 端点（约 2000 行 Java）+ MongoDB schema（500 行）+ PSUM 扩展面板（toggle 工作但解析未连）。
+- **未实现承诺**：`Open AI Assistant` / `copilot.autoCompletion` / `Switch to Diagram` / `Editor Format / Close` —— i18n 字典埋了字符串占位但 0 个 Vue 组件实际调用（§8）。
+- **生产级隐患**：裸 HTTP 部署导致 `crypto.randomUUID()` 在浏览器 secure-context 检查下变 undefined，前端文件选择交互静默崩溃（§12 缺口 ⑨）。
+
+#### 项目层（"它现在的运营状态"）
+
+| 维度 | 现状 | 证据 |
+|---|---|---|
+| GitHub 组织 `WSE-Laboratory` | 8 个仓库，最热 4★，2026 H1 多次更新 | docs/12 §2 |
+| `WSE-ModelCopilot` 仓库 | **不存在**（仅在网站 footer 占位） | docs/12 §1 |
+| 平台部署 | 单点 IP `116.204.36.247`，无 HTTPS 无域名，无负载均衡 | 本章 §2 |
+| 开放注册 | **完全开放**，无邀请码 / 邮箱白名单 | 本章 §3.1 |
+| 用户量 | 不可见（无注册数公示），ID 池 `69f9...` 序列号显示账户量 ~24 字节空间但实际可能很少 | MongoDB ObjectId 推断 |
+| 公众号 ModelCopilot | 二维码挂在网站，**搜狗/Bing/百度均无可检索文章** | docs/12 §1 / §3.4 |
+| 反馈渠道 | 平台内置 ✏ 表单（email + content + diagram 附件） | 本章 §3.10 |
+| 论文-平台联动 | PSUM 7 案例代码 GitHub 已开源[^repo-psum-sysmlv2-13]，但**在 ModelCopilot 平台跑不通** | 本章 §7.2 |
+
+整体处在**「公开 alpha 试运行 + 单点部署 + 论文 alpha 先行 + 平台代码暂留闭源」**状态。
+
+#### 学术层（"它支撑哪些研究产出"）
+
+参见 docs/12 详尽展开：
+
+- **PSUM 线**：arXiv 2602.21641 已发布（2026-02），7 工业域案例（ACC、Camera、CDS 等）已上 GitHub
+- **量子 SE 线**：SLR 76 篇 + 实证元分析 78 项 + IsingBench 工具，含 arXiv 2506.16878 和 arXiv 2510.27113
+- **LLM × MBSE 线**：LLM4MDE artifact 254 篇 SLR 已上 GitHub
+- **ADS 线**：LiveTCM-demo 4★ 是组里最热公开仓，主仓 165+ LLM 实验日志
+
+ModelCopilot 平台**理论上要做**这三条研究线的"汇聚 IDE"——但**当前 build 里只有 PSUM 线有半成品 UI**（toggle + 左栏 tab），量子线和 LLM 线在 UI 层完全无痕迹。
+
+### 13.2 5 维成熟度评分（每维 1–5 分）
+
+| 维度 | 分数 | 评估理由 |
+|---|---|---|
+| **解析 / 编译** | **4 / 5** | Pilot 内核稳定继承；纯 SysMLv2 模型成功率高；KerML mode 工作正常；缺自家扩展（PSUM 解析、跨文件） |
+| **可视化** | **4 / 5** | 7 种视图全部可生成真实 PlantUML SVG；UseCase 和 Action 在样本稀疏时返回 0 图是 Pilot 同款行为；Download 按钮在自动化里失败但人类用户应该可用 |
+| **PSUM 扩展集成** | **2 / 5** | UI 切换、模式日志、左栏 tab 全部到位（声明层 5/5），但解析器实际拒绝 stereotype 语法（实现层 1/5），加权 1.5/5（本章 §7.3） |
+| **AI / Copilot 能力** | **0.5 / 5** | 仅有 i18n 字符串占位；0 个 Vue 组件调用；后端 namespace `text2model/*` 命名暗示意图但未实现；命名营销价值显著超过当前能力 |
+| **生产部署成熟度** | **2 / 5** | 裸 HTTP + 单 IP + 无 SSL + 无负载均衡 + 公众号未启动 + 公开渠道几乎为零 + crypto.randomUUID 未 polyfill；可使用但非生产级 |
+
+加权综合（编译 / 可视化是核心权重 × 0.5，其余各 × 0.125）：**约 3.0 / 5**——alpha 末尾，beta 前夜。
+
+### 13.3 接下来大概率会干的事（按时间窗 + 概率）
+
+> 概率定义：P>70% 高概率｜P 40–70% 中概率｜P<40% 低概率推测。所有时间窗以**本快照基准 2026-05-06** 为锚点。
+
+#### 短期（1–3 月，2026-05 → 2026-08）
+
+| 行动 | 概率 | 触发理由 |
+|---|---|---|
+| **HTTPS 部署 + crypto.randomUUID polyfill** | **P>70%** | 当前 secure-context 阻断的 bug 是任何稍微深入的用户都能踩到的"点击文件无反应"——一旦 OMG TC 季 / MODELS 投稿期有外部 evaluator 试用，这条修不了的话评估意见会非常负面 |
+| **修复 Settings 命名不一致**（`Usecase` → `UseCase` 与后端对齐） | P>70% | 极低成本；任何稍微注意细节的 reviewer 一眼就发现 |
+| **添加 PSUM-SysMLv2 7 案例作为内置 Templates** | P 40–70% | 当前 Templates 仅 `Empty / Camera`，但 GitHub 仓库里有 ACC / Camera / CDS / Buoyancy / 等 7 个案例的完整源码——同步成 Template 是**几小时 ~ 一天的工作**；不做的唯一理由是 PSUM 解析器还没接通 |
+| **多文件项目支持 / 文件树展开** | P 40–70% | 当前 el-tree 节点是 leaf 不能展开（§3.2 / §11 缺口 ③）——只要用户会上传超过单文件项目就会催促修复 |
+| **OMG TC 季 demo（如果有 OMG 2026-06 会议）** | P 40–70% | 岳涛是 OMG SysML v2 contributor，每年至少 1–2 次 OMG 季会出席机会；带平台 demo 是常见做法 |
+
+#### 中期（3–6 月，2026-08 → 2026-11）
+
+| 行动 | 概率 | 触发理由 |
+|---|---|---|
+| **PSUM stereotype 解析器集成**（PSUM 集成度从 28% → 60%+） | **P>70%** | 这是 PSUM 论文与平台**最大的 credibility gap**——arXiv 2602.21641 (2026-02) 已经发了 4 个月，外界已经有人开始追问"在哪儿能跑"；不修补这个会让论文的工业落地承诺被进一步质疑。具体路径：在 Pilot fork 的 ANTLR 文法里加 PSUM stereotype 产生式 + ImportImpl 注册 PSUM 元类 → 让 §7.2 测试的 ACC-psum 19 KB 文件能解析 → `extension.psumInfo` 实际填充 → 左栏两个 tab 显示真实 Uncertainty/Indeterminacy 内容 |
+| **WSE-ModelCopilot 仓库开源**（与 PSUM 集成同步发布） | P 40–70% | docs/12 §1 已明示这是预期事件，但有 LGPL-3.0 + Spring Boot wrapper + MongoDB schema + Vue 前端**多层 stack 都要决定开源还是留闭源**——是个比单纯 push 代码更复杂的法律 / 战略决策；MODELS 2026 投稿截止日（2026-04 通常）一般刺激这种发布 |
+| **AI Copilot 第一阶段：Auto Completion** | P 40–70% | i18n 字典里 `copilot.autoCompletion: "自动补全"` 的字符串已经埋了——这是 i18n 字典里指向"AI"概念的最低风险接入点（autocomplete 比 chat / generate 容易做得不出错）；接 Pilot 的 LSP scope 信息 + 后端 `text2model/*` 命名空间已经预留 |
+| **"Switch to Diagram" 编辑器 ↔ 图表 tab 切换** | P 40–70% | i18n 已埋；当前左编辑器右图表的双栏布局有时是不必要的（小屏 / 大模型时），切换式更友好 |
+| **多模板扩展**（从 2 → 7+） | P 40–70% | 见上面的 PSUM 案例做 template；额外可能加 KerML 模板、SysML 教学模板 |
+
+#### 长期（6–12 月，2026-11 → 2027-05）
+
+| 行动 | 概率 | 触发理由 |
+|---|---|---|
+| **公众号 ModelCopilot 真正运转** | P 40–70% | 一旦平台和论文都成型，对外宣传会成为下一阶段 ROI 最高的事情；平台访问量提升后公众号能起到 funnel 作用；目前的"试运行"状态拖太久会浪费已注册的品牌 |
+| **OMG Pilot 主线代码 sync 机制建立** | P 40–70% | 现在用的是某个时刻 Pilot stdlib 的快照（51/65 命中说明部分 stdlib 滞后），长期需要 sync。技术做法可能用 git submodule 接入 Pilot 主线，类似 docs/10 推荐的 daltskin C 路径 |
+| **量子线 IsingBench / LLM 线 LLM4MDE 集成进 IDE** | P<40% | docs/12 §1 自报"统一汇聚平台"是远期愿景；但量子和 LLM 是 SE 研究方向，IDE 层集成的边际收益不明显——更可能保持独立工具仓库形态 |
+| **付费版 / 商用版分叉** | P<40% | docs/12 §1 强调"不与商业工具正面竞争"，扮演上游标准实验台；走商业化会与定位冲突。但如果团队规模扩大或资金需求，路线可能转向 |
+| **与华望 M-Design 战略协同 / 数据互通** | P<40% | 华望是国内唯一公开商用化的 SysML v2 平台（docs/00 §5 时间节点），WSE-Lab 在国家标准 GB/T 45803 起草中扮演角色——双方有合作信号但目前还看不到具体动作 |
+| **KerML 元模型层面的形式化扩展** | P<40% | 与 docs/05 形式化路径里的 RPTU SysMD / HAMR 的方向不同；WSE-Lab 当前没有公开的形式化研究背景 |
+
+### 13.4 战略定位与大趋势
+
+#### 13.4.1 在中国 MBSE 生态的位置
+
+把本快照基准日（2026-05-06）的中国 MBSE / SysML v2 生态画一张地图：
+
+| 玩家 | 性质 | 进度（2026-05） | 与 ModelCopilot 关系 |
+|---|---|---|---|
+| **国家标准 GB/T 45803-2025** | 强制性标准 | **已发布 2025-05-30 + 已实施 2025-12-01**[^gb-45803-13] | BUAA 是核心起草单位之一；ModelCopilot 是该标准的"参考实现展示" |
+| **杭州华望 M-Design** | 商用闭源平台 | **已发布 v2 alpha 2025-09-14**[^vendor-mdesign-13]；国内唯一公开商用化 | 战略上**互补不冲突**：M-Design 服务工程落地，ModelCopilot 服务学术验证 |
+| **OMG Pilot Implementation** | 国际开源参考实现 | LGPL-3.0，221★，2026-05 活跃[^repo-pilot-13] | ModelCopilot 是其 fork（§6 取证）；**预计长期 sync 但保留 PSUM 等扩展** |
+| **Sensmetry SysIDE / Syside Editor** | 立陶宛 → 美国，**已闭源升级到商业版**[^syside-rebirth-13] | 商业 LSP/IDE 主导地位 | 反例：**WSE-Lab 未来若也走闭源路线，公开档案就会和 Sensmetry 一样消失** |
+| **大连理工 SysMLine** | 学术 PoC | 5★[^repo-sysmline-13]，活跃度低 | ModelCopilot 是其升级版 |
+| **刘玉生《精华透视：SysML v2》专著** | 教学权威 | **2025-10 出版** | ModelCopilot 与该书在中文 SysML v2 普及上**都是学术语境的 anchor** |
+
+ModelCopilot 在这张地图上的卡位是：**「国家标准的参考实现示范点 + Pilot Implementation 的中文学术分支 + 工业商用平台（华望）的非竞争性上游」**。这是一个**没有直接竞争对手**的位置——既不与商业平台抢市场，也不与学术工具抢饭碗。
+
+#### 13.4.2 在全球 SysML v2 生态的位置
+
+OMG Final Adoption (2025-07-21) 之后，全球 SysML v2 落地进入"工业铺开"阶段：
+
+- **2026 H1 浪潮**：商用厂商集体发布 v2 集成（Cameo 2026x、Siemens Capital 2512、PTC Windchill 10、Ansys SAM 2026 R1、Visual Paradigm SysML v2 Studio 等）
+- **学术冷却**：早期 v2 形式化论文（MODELS 2024–2025）势头放缓，Almeida 等的 KerML 4D 时空语义批评[^almeida-2024-13]之后语义研究进入次级关注
+- **AI × MBSE 兴起**：Loughborough *MBSE Co-Pilot* 路线图论文[^mbse-copilot-loughborough-13]、SysTemp / SysMBench / Internetware 实证、LLM × SysML 论文涌现
+
+ModelCopilot 在这个全球图谱里的位置是**「学术参考实现 + AI 增强承诺 + 中文标准接入点」**——是一个**有明显独占生态位但 visibility 偏弱**的卡位。Pilot 占了"标准实现"的位置，Cameo / Siemens 占了"商用工程"的位置，Sensmetry 占了"商业 IDE"的位置，**ModelCopilot 占的是"学术参考 + AI 元能力 + 中文锚点"的位置**。这个位置的天然短板是 visibility——学术圈知道但工业圈完全陌生（公众号未启动 + 平台代码未开源）。
+
+#### 13.4.3 大趋势：AI4MBSE 是兵家必争之地
+
+PSUM × ModelCopilot 是当前 OMG SysML v2 生态里**少数几个把"扩展规范 × 完整工具链 × 工业域案例"三者打包推出的项目**之一（Loughborough 路线图只画了图但没有平台；商用厂商只把 v2 当 v1 升级路径但没有 PSUM 这种新机制；Pilot 自己还没碰 PSUM）。
+
+AI Copilot 是这条赛道**所有玩家都看到但谁都没有真正落地**的方向：
+
+- **Pilot Implementation**：LSP 支持但无 AI
+- **Sensmetry Syside**：闭源，AI 接入未公开
+- **Cameo / Siemens / IBM**：商用 IDE 集成 ChatGPT 类工具但与 v2 元模型对接深度浅
+- **学术界**：Loughborough 路线图、Internetware LLM 论文、SysTemp / SysMBench 等评测数据集——大量纸面工作，少量代码
+
+在这个空当里，**ModelCopilot 占据了"学术参考 + AI Copilot 概念预占"的位置**——i18n 字典里的占位符号是个无心或有意的"插旗"行为：把字符串先埋进去，将来真接 AI 时不需要重做翻译。这种做法在大型平台开发里很常见，但作为外部 reviewer 看见这个细节会得到一个明确信号：**WSE-Lab 在 AI 接入这件事上是认真的，只是工程化次序还没排到这里**。
+
+如果 2026 H2 团队真的把 `copilot.autoCompletion` 接通——哪怕只是一个 wraps OpenAI API 的最简实现——他们会成为**全球第一个把 SysML v2 IDE × LLM 自动补全做成产品级的玩家**（截至本快照，这条路上还没有出现已交付实物的竞品）。这是一个**短窗口、高赔率**的卡位机会。
+
+#### 13.4.4 一个潜在的"剧本"：未来 12 个月最可能的故事
+
+把上面的概率合成一个 narrative：
+
+- **2026-06–07**：HTTPS 部署修 bug + 命名一致性 + 7 PSUM Templates 上线
+- **2026-08（OMG 标准季 / MODELS 截稿期）**：PSUM 解析器集成首版发布 → `extension.psumInfo` 实际填充 → arXiv 2602.21641 论文与平台首次完整 demo
+- **2026-09–10**：WSE-ModelCopilot 仓库开源（含 Pilot fork 的 wrapper + Vue 前端 + PSUM 解析扩展），LGPL-3.0
+- **2026-11–12**：AI Copilot Auto Completion 第一版上线（接外部 LLM API，先做 keyword + signature 补全）
+- **2027-01–03**：公众号开启正常运营 + 与华望 / 商飞 / 兵器等 GB/T 45803 起草伙伴的工业案例集发布
+- **2027-04–05**：MODELS / DASC / INCOSE IS 接受 ModelCopilot + PSUM 整合论文发表
+
+这个剧本的关键风险点是 **(a) 团队 bandwidth 是否能支撑**（量子 / LLM4MDE / PSUM / 平台 4 条线并行）和 **(b) Pilot LGPL-3.0 在开源时机的法律决策**——这两条卡死任何一条都会让剧本拖到 2027 H2。
+
+### 13.5 风险与不确定性（综述责任要求的反面陈述）
+
+学术综述的"正反两面"原则要求列出**对 ModelCopilot 不利的事实和不确定性**：
+
+1. **平台代码不开源是可信度伤害源**：尽管 §6 取证证实了 Pilot fork 关系，**外部研究者无法独立复现 PSUM 论文的工业案例验证**，这是论文 reproducibility 的硬伤
+2. **公开渠道几乎为零**：公众号试运行 / 仓库占位 / 单点 IP / 无 SSL——任何一项都是"早期实验室项目"的信号，组合在一起是**对外可见度仅靠口碑（OMG TC 圈子内）维持**
+3. **团队 bandwidth 可能是隐藏瓶颈**：docs/12 §2 显示团队公开成员数有限，但同时维护 8 个公开仓库、3 条独立研究方向（PSUM / 量子 / LLM）、1 个平台、1 个公众号——任何一项延期都正常
+4. **Pilot 上游 sync 存在长期风险**：Pilot 主线持续推进（51/65 命中说明 ModelCopilot 已经 lag 了若干 stdlib 模块），如果不建立 sync 机制，2027 后会出现**与 Pilot 主线渐行渐远**的 fork drift
+5. **AI Copilot 占位字符串可能永远不接通**：i18n 字典里的占位符号是软承诺，不是合约——见 docs/13 §8 的 dead code 类比；存在团队后续永远不接通的可能（特别是如果 AI 部分被分到一个尚未启动的子项目，或团队 bandwidth 被论文优先级吸走）
+6. **裸 HTTP 部署在中国大陆是合规红线**：根据《网络安全法》和等保 2.0 要求，长期向公众提供服务的 web 平台需要 SSL。当前部署方式如果不在合规期窗内修复，会触发 ICP / 公安联网备案问题——这是**比技术债更紧急的合规债**
+
+> **诚实标注**：以上 6 点中，第 6 点的合规判断是基于一般行业常识的推断，不是法务意见；本仓库不为此提供法律建议。
+
+### 13.6 给读者的三条具体建议
+
+1. **如果你是研究者要引用 ModelCopilot 平台**：引用 docs/12 中的论文链接（arXiv 2602.21641）+ 本章 §6 的 Pilot 同源性发现作为"独立验证"——不要直接引用 `116.204.36.247`（IP 可能漂移、HTTP 可能换 HTTPS、token 可能失效）
+2. **如果你是工程师要采用类似技术栈**：直接用 OMG Pilot Implementation[^repo-pilot-13]，不要依赖 ModelCopilot——后者是前者的 fork + 包装层；除非你确实需要 PSUM 扩展（待 §13.3 中期路线图实现后再评估）
+3. **如果你是国内 MBSE 同行**：把本章作为"国家标准 GB/T 45803 的参考实现现状"读——ModelCopilot 是 BUAA + WSE-Lab 在该标准下的代表性成果之一，但**当前 build 与论文承诺仍有 gap**（PSUM 28% 集成度），跟踪本仓 2026-11 / 2027-05 两个采样点的更新即可
+
+## 14 与本仓其他章节的交叉引用
 
 - **docs/03-beihang-investigation §2.7** — WSE-Lab 团队画像 + 8 个仓库总览
 - **docs/04-parsing-ide-infrastructure §1** — OMG Pilot Implementation 解析能力（与本平台的渲染管线高度同源）
@@ -815,3 +981,15 @@ i18n 字典里有完整的 `editor.format / close / closeOthers / closeAll` 套�
 [^repo-psum-sysmlv2-13]: WSE-Laboratory. *PSUM-SysMLv2*. <https://github.com/WSE-Laboratory/PSUM-SysMLv2>. 包含 7 个工业域案例（含 ACC、Camera 等）；本章用的 `Adaptive Cruise Control system/origin/ACC.sysml`（6587 字节）即源自此仓库。完整书目见 [references.md](references.md#repo-psum-sysmlv2)。
 
 [^js-bundle-13]: ModelCopilot 平台前端 JS bundle `index-DrCKs0sc.js`（采样 2026-05-05，1.17 MB）。本章对 i18n 字典的关键字段提取（`openAiAssistant` / `copilot.autoCompletion` / `switchToDiagram` 等）通过 `requests.get` 该资源 + 正则匹配获得；DOM 严格匹配通过 Playwright `page.evaluate` 在登录态 `/home` 路由下执行。原始 bundle 与提取脚本保存于 `/tmp/mc-explore/27_deep_explore.py` 及后续 6 个 round 的脚本中。
+
+[^gb-45803-13]: 国家标准全文公开系统. *GB/T 45803-2025 系统与软件工程 基于模型的系统工程 统一架构建模语言*. 2025-05-30 发布，2025-12-01 实施。起草单位含北京航空航天大学、北京理工大学、中国电子技术标准化研究院等 16 家。完整书目见 [references.md](references.md#gb-45803)。
+
+[^vendor-mdesign-13]: 杭州华望系统科技有限公司. *M-Design v2 alpha*. 2025-09-14 发布——国内**唯一公开商用化**的 SysML v2 平台。完整书目见 [references.md](references.md#vendor-mdesign)。
+
+[^syside-rebirth-13]: Sensmetry. *SysIDE → Syside Editor 商业化升级*. 2026-04。完整书目见 [references.md](references.md#syside-rebirth)。
+
+[^repo-sysmline-13]: Ruizhe-Yang. *SysMLine* (大连理工大学). EPL-2.0，5★。<https://github.com/Ruizhe-Yang/SysMLine>。完整书目见 [references.md](references.md#repo-sysmline)。
+
+[^almeida-2024-13]: Almeida 等. *An Analysis of the Semantic Foundation of KerML and SysML v2*. ER 2024. 完整书目见 [references.md](references.md#almeida-2024-kerml)。
+
+[^mbse-copilot-loughborough-13]: Loughborough 大学. *MBSE Co-Pilot: A Research Roadmap*. INCOSE *Systems Engineering* 2026, DOI 10.1002/sys.70011（vision-only 路线图论文，**与本平台同名同题但完全无关**）。完整书目见 [references.md](references.md#mbse-copilot-loughborough)。
