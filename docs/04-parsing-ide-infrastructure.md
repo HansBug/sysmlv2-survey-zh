@@ -43,22 +43,122 @@ Xtext 文法物理上分两个 OSGi bundle：
 
 Pilot 整体走 LGPL-3.0；任何"派生作品"复用 Pilot 内部 `.xtext` 或 `src-gen/` 下生成的 ANTLR3 文法都受同样约束。这是为什么需要 §2、§3 介绍的独立 ANTLR4 / Langium 替代品——它们多数走 MIT / Apache-2.0，license 兼容面更广。
 
+### 1.6 Pilot 文法文件如何使用：本地实测
+
+Pilot 仓库提供两类「文法文件」，使用门槛差异显著：
+
+**(A) `*.xtext` 源文件（人写文法）**：[`KerML.xtext`][^pilot-kerml-xtext]、[`SysML.xtext`][^pilot-sysml-xtext]。这是 Xtext 元语言（不是 ANTLR、不是 EBNF），**不能直接被 ANTLR / Langium / 其它 parser generator 消费**。要用它必须通过 Eclipse Xtext 工具链：在 Eclipse + Xtext SDK 中打开工程，由 Xtext 的 `MWE2 workflow` 调起代码生成器，生成 `src-gen/.../InternalSysML.g`（ANTLR3）+ 配套 Java 代码。
+
+**(B) `InternalSysML.g`（自动生成的 ANTLR3）**：路径 [`org.omg.sysml.xtext/src-gen/org/omg/sysml/xtext/parser/antlr/internal/InternalSysML.g`][^pilot-internal-sysml]，**29351 行**。理论上是合法 ANTLR3 文法，但**绑死 Xtext runtime**——不能脱离 Xtext 单独使用：
+
+```bash
+# 实测（2026-05-05）：
+$ wc -l /tmp/pilot/org.omg.sysml.xtext/src-gen/.../InternalSysML.g
+29351
+
+$ grep -cE "import org\.eclipse\.xtext" \
+    /tmp/pilot/org.omg.sysml.xtext/src-gen/.../InternalSysML.g
+8
+```
+
+`InternalSysML.g` 头部即声明 `superClass=AbstractInternalAntlrParser`，且 `@parser::header` 与 `@lexer::header` 内嵌 `org.eclipse.xtext.*` 导入与 `org.eclipse.xtext.parser.impl.AbstractInternalAntlrParser` 父类。任何想脱离 Eclipse Xtext runtime 把它接入自己的工具链都不可行——这正是 daltskin（§3）选择**不**复用 Pilot 文法、转而从 OMG KEBNF 重新生成的根本原因。
+
+实践结论：**若要"用 Pilot 的语法"，最现实的路径是接入 Pilot 自身**——通过其 Jupyter kernel 或 Eclipse 插件作为黑盒的解析 / 求值器。下面 §1.7 是 Jupyter kernel 的本地实测。
+
+### 1.7 官方 Jupyter kernel 本地实测（2026-05-05）
+
+按 [Pilot 官方 Jupyter 安装指南][^pilot-jupyter-install]步骤本地实测安装与简单例子运行。
+
+**装：**
+
+```bash
+# 1. 装 OpenJDK 21（参见 §3.6 工具链小节）
+$ /tmp/jdk-21.0.11/bin/java -version
+java version "21.0.11" 2026-04-21 LTS
+
+# 2. 用 micromamba（conda 兼容、单二进制、无需 root）从 conda-forge 拉 kernel
+$ curl -sL "https://micro.mamba.pm/api/micromamba/linux-64/latest" \
+    | tar -xvj bin/micromamba
+$ /tmp/bin/micromamba create -y -r /tmp/mamba-root -n sysml \
+    -c conda-forge "jupyter-sysml-kernel=0.58.0" python=3.12
+
+# 3. 列内核
+$ /tmp/bin/micromamba run -r /tmp/mamba-root -n sysml \
+    jupyter kernelspec list
+Available kernels:
+  sysml    /tmp/mamba-root/envs/sysml/share/jupyter/kernels/sysml
+```
+
+> 备注：[官方 install.sh][^pilot-install-sh] 用 `conda install` 走完整 Anaconda；但 conda-forge 同步发布的 `jupyter-sysml-kernel=0.58.0` 也能被 micromamba 直接拉，省去 Anaconda 整套发行版（300+ MB → ~50 MB）。pip 上没有该包（截至 2026-05-05 实测 `pip install jupyter-sysml-kernel` 报 "No matching distribution found"）。
+
+**跑一个 OMG 训练样例：**
+
+把 `Subsetting Example.sysml`（`SysML-v2-Release/sysml/src/training/04. Subsetting/`，342 字符）通过 `jupyter_client` 直接送入 kernel：
+
+```python
+import jupyter_client
+km, kc = jupyter_client.manager.start_new_kernel(kernel_name='sysml')
+src = open('Subsetting Example.sysml').read()
+kc.execute(src)
+# ... read iopub messages ...
+```
+
+输出：
+
+```
+[result] {'text/plain': 'Package Subsetting Example (5e719f40-628a-456c-81db-1a28f6cac150)\n'}
+```
+
+——返回了被解析后的顶层 `Package` 元素的名称 + KerML §9.1 强制规定的 **UUID v5**（详见 [01-标准状态 §16.3](01-standard-status.md#163-全局标识uuid-v5-强制要求)）。这证明 Pilot 官方 Xtext 文法 + Jupyter kernel 在本地工程机上端到端可用。
+
+**小结**：Pilot 文法的使用方式只有「随 Pilot 整体打包用」一条路。如果你的诉求是把文法文件本身嵌入自己的工具链做轻量级 parse/AST 处理，**不要**走 Pilot Xtext，**用 daltskin 的 ANTLR4**（§3）。
+
 ## 2 第三方独立 parser 全景
 
-截至 2026-05，存在 **6 套独立 parser**，覆盖 Java/Xtext、TS/Langium、TS/ANTLR4、Rust/nom、Java/MontiCore、C#/.NET 六种技术栈。
+截至 2026-05，存在 **9 套独立 parser** 实现，覆盖 8 种语言 / runtime 与 6 种文法形式（grammar formalism）。下面 §2.1 是一张拆分了「技术栈」与「语法形式」两列的总表；§2.2 给出每个 parser 的简要定位与可点击的仓库 / 商店链接；§2.3 整理 license 与活跃度信号；细节深读见 §3（ANTLR4 严格对应分析）与 §4（tree-sitter）。
 
-| 实现 | 技术栈 | 文法体量 | 错误恢复 | 增量 | 校验规则 | 性能 | License | 状态 |
-|---|---|---|---|---|---|---|---|---|
-| Pilot | Xtext + ANTLR3 + EMF + Java 21 + Eclipse 2025-12 | KerML 1124 行 + SysML 2438 行 | ANTLR3 backtrack | 全文件重解析 | 73 条 `@Check` | 大模型慢 | LGPL-3 | 规范权威 |
-| **daltskin/sysml-v2-grammar** | ANTLR4 + auto-gen from KEBNF | 1 lexer + 1 parser，**452 parser rules + 226 lexer tokens** | ANTLR4 errornode | 否 | 基本 | 高（生产可用，详 §3） | **MIT** | **活跃，首选** |
-| SysIDE Legacy | Langium + Chevrotain + TS | 2174+1197 行 `.langium` | 整文件 | 否 | KerML+SysML 共 108 KB | 慢 | EPL-2 / GPL-2-CPE 双许可 | **已 archive**，新版闭源 |
-| 新版 Syside Editor | Sensmetry 重写 | 闭源 | 闭源 | 闭源 | 闭源 | 50× legacy | **闭源商业** | VS Code 4254 安装最高 |
-| spec42 / sysml-v2-parser | Rust + nom 8 + tower-lsp | AST 单文件 83 KB | resilient `parse_for_editor` | nom 友好 | 规范级 | 快 | MIT | 个人维护，6★ |
-| MontiCore sysmlv2 | MontiCore .mc4 | 12 文件分层 | MontiCore | 否 | 规范级 | n/a | BSD-3 派生（MontiCore 3-level） | 学术，工程粗糙 |
-| sireum/hamr-sysml-parser | ANTLR4 + GUMBO 注入 | SysMLv2.g4 1892 行 + KerMLv2.g4 1015 行 + GUMBO.g4 | ANTLR4 | 否 | 规范级 | n/a | **LGPL-3.0**（继承自 Pilot） | HAMR 依赖，license 风险 |
-| KerML.NET | C# / .NET in-memory + JSON | **无 parser** | n/a | n/a | n/a | n/a | Apache-2.0 | .NET 端孤本 |
+### 2.1 总表
 
-详见 [此前版本第 4 章 §2 各家技术内核分析](#)（保留）；本次重点扩写 §3 ANTLR 严格对应分析。
+| 实现 | 技术栈（语言 / runtime） | 语法形式（grammar formalism） | 文法体量 | License | 状态 |
+|---|---|---|---|---|---|
+| [Pilot Implementation][^repo-pilot] | Java 21 + Eclipse 2025-12 + EMF + Tycho Maven | **Xtext**（生成 ANTLR3 内部 parser） | KerML 1124 行 + SysML 2438 行 | LGPL-3.0 | 规范权威，活跃 |
+| [daltskin/sysml-v2-grammar][^repo-daltskin-grammar] | 通用（生成 10 语言 SDK） | **ANTLR4**（自动从 OMG KEBNF 生成 + 56 处 patch） | 1 lexer + 1 parser，452 parser 规则 + 226 lexer 规则 | MIT | 活跃，**ANTLR4 首选** |
+| [SysIDE Legacy（sensmetry/sysml-2ls）][^repo-sysml-2ls] | Node.js + TypeScript | **Langium**（Chevrotain 内核） | 2174 + 1197 行 `.langium` | EPL-2.0 / GPL-2.0-CPE 双许可 | **已 archive 2025-10**，新版闭源 |
+| [新版 Syside Editor（VS Code 商店版）][^vscode-syside] | Node.js + TS（细节闭源） | 闭源（推测仍 Langium） | 闭源 | **闭源商业** | VS Code marketplace 4254 安装，最大 |
+| [elan8/spec42][^repo-spec42] | Rust + tower-lsp 0.20 + clap | **手写 Rust + nom 8 解析器组合子** | workspace 三 crate；entry 在 [`elan8/sysml-v2-parser`][^repo-sysml-v2-parser] | MIT | 个人维护，6★，活跃 |
+| [elan8/sysml-v2-parser][^repo-sysml-v2-parser] | Rust + nom 8 + nom_locate | **手写 Rust + nom 解析器组合子** | AST 单文件 83 KB；parser 28 文件 | MIT | spec42 的解析后端，2★ |
+| [MontiCore/sysmlv2][^repo-monticore] | Java + Gradle + MontiCore 框架 | **MontiCore `.mc4`**（语言工坊 DSL） | 12 个 `.mc4` 模块化文件 | BSD-3 派生（MontiCore 3-level license） | 学术严谨，工程粗糙，33★ |
+| [sireum/hamr-sysml-parser][^repo-hamr-parser] | Scala / Slang + Sireum | **ANTLR4**（从 Pilot Xtext `src-gen/` 的 ANTLR3 内部 grammar 翻译） | `SysMLv2.g4` 1892 行（含 GUMBO）+ `KerMLv2.g4` 1015 行 + `GUMBO.g4` | **LGPL-3.0**（继承自 Pilot） | HAMR 依赖，11★ |
+| [STARIONGROUP/KerML.NET][^repo-kerml-net] | C# / .NET 8 | **无 parser**（仅 in-memory model + JSON serializer） | n/a | Apache-2.0 | .NET 端孤本，1★ |
+
+> 注：`spec42` 与 `sysml-v2-parser` 是同一作者（elan8）的两个独立 crate——前者是 LSP server，后者是其依赖的解析后端。本表把二者分开列以便区分定位。
+
+### 2.2 每个 parser 的一句话定位
+
+- **[Pilot Implementation][^repo-pilot]**：OMG Reference Implementation Working Group 维护的官方实现；Eclipse + Xtext + EMF + Jupyter kernel + PlantUML 可视化整套栈，是规范一致性的事实参照。本章 §1 做了详细解剖；§5 给出官方安装路径与本地实测结果。
+- **[daltskin/sysml-v2-grammar][^repo-daltskin-grammar]**：单人维护、MIT 许可的纯 ANTLR4 文法仓库；其工程亮点是 `scripts/generate_grammar.py` 自动从 OMG KEBNF 生成 + `PATCHES.md` 记录 56 处 ambiguity 修复，并通过 GH Actions 周 cron 自动追上游 release[^daltskin-generate][^daltskin-patches]。已合入 [antlr/grammars-v4 官方仓库][^antlr-grammars-v4]。本章 §3 / §6 对其做完整深读 + 本地实测。
+- **[SysIDE Legacy（sensmetry/sysml-2ls）][^repo-sysml-2ls]**：Sensmetry 公司 2024–2025 年的开源 Langium-based LSP；2025-10 archive 后被闭源商业版替代，是开源生态的最大隐忧。`packages/syside-languageserver/src/grammar/SysML.langium` 是规范认真重写的 Langium 文法，可作为研究参考（54 KB / 2174 行）。
+- **[新版 Syside Editor][^vscode-syside]**：Sensmetry 闭源升级版；VS Code marketplace 4254 安装为生态最大，但所有源码与文法不公开。
+- **[elan8/spec42][^repo-spec42] + [elan8/sysml-v2-parser][^repo-sysml-v2-parser]**：单人 Rust 实现；亮点是 `parse_for_editor()` resilient 模式（部分 AST + diagnostics）与 Zed 编辑器集成 query 文件。
+- **[MontiCore/sysmlv2][^repo-monticore]**：RWTH Aachen MontiCore 语言工坊的 SysML v2 实现；把 OMG 单一文法拆 12 个 `.mc4` 模块（`SysMLActions / SysMLBasis / SysMLConnections / SysMLConstraints / …`），是 language composition 哲学的展示，但工程化短板（VS Code client 需 hack `SYSMLV2_LSP_PORT` env var）。
+- **[sireum/hamr-sysml-parser][^repo-hamr-parser]**：HAMR 高保障代码生成栈的解析前端；语法上注入了 GUMBO 契约 DSL，适合 AADL / seL4 集成场景，但 LGPL-3.0 license 限制了通用复用。
+- **[STARIONGROUP/KerML.NET][^repo-kerml-net]**：.NET 生态中唯一的 KerML 内存模型 + JSON 序列化库；不含 parser，需配合其它 parser 用。
+
+### 2.3 License 与活跃度信号
+
+| 实现 | License | 最近 commit | Star | 主要依赖 |
+|---|---|---|---|---|
+| Pilot Implementation | LGPL-3.0 | 2026-05-04 | 221 | 仅 Eclipse / Maven Central |
+| daltskin/sysml-v2-grammar | MIT | 2026-04-21 | 6 | OMG KEBNF（cron 同步） |
+| SysIDE Legacy | EPL-2.0 / GPL-2-CPE | 2025-10（archived） | 52 | npm: langium 3.x |
+| 新版 Syside Editor | 闭源 | 私有 | n/a (4254 装机) | 私有 |
+| elan8/spec42 | MIT | 2026-05-04 | 6 | nom 8、tower-lsp 0.20、clap |
+| elan8/sysml-v2-parser | MIT | 2026-05-04 | 2 | nom 8、nom_locate |
+| MontiCore/sysmlv2 | BSD-3 派生（MontiCore 3-level） | 2026-05-02 | 33 | MontiCore 框架 + Gradle |
+| sireum/hamr-sysml-parser | LGPL-3.0（继承自 Pilot） | 2026-02-03 | 11 | Pilot Xtext src-gen 与 ANTLR4 |
+| STARIONGROUP/KerML.NET | Apache-2.0 | 2025-03 | 1 | .NET 8、Newtonsoft.Json |
+
+详细 license 兼容性矩阵见 §3.7。
 
 ## 3 ANTLR4 文法严格对应分析（重点）
 
@@ -430,3 +530,17 @@ spec42 自带 query files（见 §2 spec42 行），是 Zed 用户当前唯一�
 [^beta-sysand]: sysand 公共索引 beta. <https://beta.sysand.org/>
 
 [^sysand-hosting]: sysand `hosting_index.md`. <https://github.com/sensmetry/sysand/blob/main/docs/src/hosting_index.md>
+
+[^repo-sysml-2ls]: *sensmetry/sysml-2ls (SysIDE Legacy, archived)*. <https://github.com/sensmetry/sysml-2ls>
+
+[^repo-monticore]: *MontiCore/sysmlv2*. <https://github.com/MontiCore/sysmlv2>
+
+[^repo-kerml-net]: *STARIONGROUP/KerML.NET*. <https://github.com/STARIONGROUP/KerML.NET>
+
+[^antlr-grammars-v4]: ANTLR 官方 grammars-v4 仓库内的 sysml-v2 子目录（由 daltskin 上游提供）。<https://github.com/antlr/grammars-v4/tree/master/sysml-v2>
+
+[^pilot-internal-sysml]: Pilot Xtext 在 `src-gen/` 下生成的 ANTLR3 内部文法 `InternalSysML.g`（29351 行，绑死 Xtext runtime）。<https://github.com/Systems-Modeling/SysML-v2-Pilot-Implementation/blob/master/org.omg.sysml.xtext/src-gen/org/omg/sysml/xtext/parser/antlr/internal/InternalSysML.g>
+
+[^pilot-jupyter-install]: Pilot 官方 Jupyter 安装指南。<https://github.com/Systems-Modeling/SysML-v2-Release/blob/master/install/jupyter/README.adoc>
+
+[^pilot-install-sh]: Pilot 官方 `install/jupyter/install.sh`. <https://github.com/Systems-Modeling/SysML-v2-Release/blob/master/install/jupyter/install.sh>
