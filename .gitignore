@@ -1,0 +1,16 @@
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~
+
+# Build / cache
+node_modules/
+dist/
+.cache/
+.tmp/
+
+# Local notes (private)
+NOTES.local.md
+*.local.md
