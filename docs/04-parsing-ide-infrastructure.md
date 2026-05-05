@@ -452,9 +452,79 @@ Base.kerml: 15 errors, first error:
 **结论**：
 
 1. daltskin 是「严格标准 ANTLR4，零私有扩展」，三个 runtime 给出位精确一致的解析结果（339/362）。
-2. 在 daltskin 设计支持的 SysML 文件范围内，**官方 corpus 全过（158 / 158）+ 真实世界 v2 corpus 96.9%（339 / 350）**——剩余 11 个失败文件主要是 Beta1 老语法或自定义扩展，不是文法 bug。
+2. 在 daltskin 设计支持的 SysML 文件范围内，**官方 corpus 全过（158 / 158）+ 真实世界 v2 corpus 96.9%（339 / 350）**——剩余 11 个失败文件全部为用户代码偏离 OMG v2 规范，**没有一个是 daltskin 文法的真 gap**。逐文件根因分析见 §3.6.8。
 3. KerML 文件（`.kerml`）**不在 daltskin 范围内**（§3.6.5），需另外接 sireum / Pilot Xtext / 自跑 nomograph kebnf。
 4. 性能上 Java >> JS >> Python，但都可以工程化使用——Python 1 秒 / 文件足够供 LSP 与 CI lint 使用。
+
+#### 3.6.8 失败案例根因分析（11 / 350 真 v2 子集）
+
+> 本节用「最小可复现 + ANTLR 报错 + spec 引用」方式逐文件追溯每个失败。每一条都做了在剥离上下文的最小 `.sysml` 片段上的复现（在 §3.6.3 的 Python harness 里），确认 ANTLR 错误指向源代码偏离 OMG v2 规范，而非 daltskin 文法漏写。
+
+**类别汇总**（11 个失败按根因分布）：
+
+| 类别 | 数量 | 例 |
+|---|---|---|
+| **A. 关键字上下文误用 / 自创关键字** | 2 | 顶层用 `actor X;`、自创 `evaluate` |
+| **B. SysML v1 / Beta / Cameo / Modelica 风过期或非标语法** | 6 | `&&` / `alias as` / `id 'X'` / `@[SI::kg]` / `enum` |
+| **C. 非 v2 字符串字面量** | 1 | Python 风三引号 `"""..."""` |
+| **D. 保留字直接作标识符（未用 unrestricted name 引号）** | 2 | `classifier:` / `enum new` |
+| **daltskin 真 gap** | **0** | — |
+
+##### 详细案例表
+
+| # | 仓库:路径 (commit) | 偏离片段（含 `Lxx` 行号） | ANTLR4 报错（首条） | 类别 | OMG v2 spec 应写法 |
+|---|---|---|---|---|---|
+| 1 | [GfSE/SysML-v2-Models @ ebbb0c3 :: `EIT_System_Use_Cases.sysml`](https://github.com/GfSE/SysML-v2-Models/blob/ebbb0c3/models/SE_Models/EIT_System_Use_Cases.sysml#L4) | `L4: actor Doctor;`（位于 package 顶层） | `extraneous input 'actor' expecting {abstract, action, alias, …}` | **A** | OMG training/35 全部 `actor` 用法都在 `use case def {…}` body 内：`use case def C { actor doctor : Person; … }`（v2 §22.2 Use Case Definition） |
+| 2 | [GfSE/SysML-v2-Models @ ebbb0c3 :: `HVACSystemRequirements.sysml`](https://github.com/GfSE/SysML-v2-Models/blob/ebbb0c3/models/SE_Models/HVACSystemRequirements.sysml#L51) | `L51: ... && ...`（C 风布尔与） | `extraneous input '&' expecting {all, behavior, …}` | **B** | v2 §8 Expression Notation 用 `and` 关键字（同 KerML §7.4.10）：`particleFiltrationEfficiency >= minFiltrationEfficiency and …` |
+| 3 | [GfSE/SysML-v2-Models @ ebbb0c3 :: `VehicleModel.sysml`](https://github.com/GfSE/SysML-v2-Models/blob/ebbb0c3/models/SE_Models/VehicleModel.sysml#L201) | `L201: alias ISQ::TorqueValue as Torque;` | `mismatched input '::' expecting 'for'` | **B** | v2 §9.2.5 Alias 唯一形式 `alias <Name> for <QualifiedName>;`：`alias Torque for ISQ::TorqueValue;`（Beta1 之前曾用 `as`，正式版统一为 `for`） |
+| 4 | [GaloisInc/HARDENS @ e24bfdb :: `RTS_Static_Architecture.sysml`](https://github.com/GaloisInc/HARDENS/blob/e24bfdb/specs/SysML/RTS_Static_Architecture.sysml#L343) | `L343: connect eventControl.manualActuatorInput[1] to actuation.actuator1.manualActuatorInput;` | `missing 'to' at '['` | **B** | OMG training/09 Connections 中 connector end 的多重度写**前缀**：`connect [1] eventControl.manualActuatorInput.elem1 to actuation.actuator1.manualActuatorInput;`。HARDENS 的写法是把 `[1]` 当作 array 索引，这种"sequence 元素访问"在 v2 文本中不是 `[]` 而是 sequence access 函数（§8.5 Sequence Functions） |
+| 5 | [GaloisInc/HARDENS @ e24bfdb :: `SemanticProperties.sysml`](https://github.com/GaloisInc/HARDENS/blob/e24bfdb/specs/SysML/SemanticProperties.sysml#L64) | `L64: classifier: String;`（`classifier` 作字段名） | `extraneous input 'classifier' expecting {abstract, action, …}` | **D** | `classifier` 是 KerML §8.2.2.6 列出的保留关键字。要把它作为标识符须用 unrestricted name：`'classifier' : String;` |
+| 6 | [GfSE/MBSE_AG_vacuum-cleaner-robot-example @ 64cafbc :: `Functions/legacy/VacuumingSystem/FilterSystem.sysml`](https://github.com/GfSE/MBSE_AG_vacuum-cleaner-robot-example/blob/64cafbc/Functions/legacy/VacuumingSystem/FilterSystem.sysml#L28) | `L28: enum new;`（`enum` 关键字 + `new` 作标识符） | `extraneous input 'new' expecting {…}` | **B + D** | v2 没有 `enum` 关键字（用 `enumeration def` / `enum def` 视版本）；同时 `new` 也是 v2 中可能预留为关键字的标识符。该文件路径就含 `legacy`，作者已经标注是过期代码 |
+| 7 | [GfSE/MBSE_AG_vacuum-cleaner-robot-example @ 64cafbc :: `SystemLevel/DriveUnit.sysml`](https://github.com/GfSE/MBSE_AG_vacuum-cleaner-robot-example/blob/64cafbc/SystemLevel/DriveUnit.sysml#L10) | `L10: requirement def id 'Req001' MaximaleMasse {` | ``mismatched input ''Req001'' expecting {';', '{'}`` | **B** | v2 §32.2 Requirement Definition 把需求 ID 放在 `<…>` 中：`requirement def <'Req001'> MaximaleMasse {…}`。该 `id` 关键字风格疑似来自 SysML v1 ReqIF |
+| 8 | [GfSE/MBSE_AG_vacuum-cleaner-robot-example @ 64cafbc :: `SystemLevel/SystemRequirements.sysml`](https://github.com/GfSE/MBSE_AG_vacuum-cleaner-robot-example/blob/64cafbc/SystemLevel/SystemRequirements.sysml#L12) | `L12: require constraint { vacuumCleaner::mass <= 5@[SI::kg] }` | `extraneous input '[' expecting {…}` | **B** | v2 单位字面量是 `<value>[<unit>]` 不带 `@`：`5[SI::kg]`（v2 §10 Quantities）。`@` 在 v2 中是 metadata 注解算子（v2 §40），把它接 `[` 会进入 metadata 分支 |
+| 9 | [mimidbe/SysML-v2-to-Modelica @ 90a3e52 :: `Cube3DModel.sysml`](https://github.com/mimidbe/SysML-v2-to-Modelica/blob/90a3e52/Cube3DModel.sysml#L56) | `L56: code = """\n  result = (\n    cq.Workplane("` | `mismatched input '"\r\n …'` | **C** | v2 §8.2.2.3 仅支持单 / 双引号 inline 字符串 + `\u{...}` 转义。Python 风三引号 `"""..."""` 不在词法表内。若要嵌入多行代码，应改用 KerML `doc /* … */` 注释 + 工具自解析，或拼接多行字符串 |
+| 10 | [mimidbe/SysML-v2-to-Modelica @ 90a3e52 :: `exemple_enumeration.sysml`](https://github.com/mimidbe/SysML-v2-to-Modelica/blob/90a3e52/exemple_enumeration.sysml#L26) | `L26: small = 60@[SI::mm];` | `extraneous input '[' expecting {…}` | **B** | 同 #8。改为 `small = 60[SI::mm];` |
+| 11 | [mimidbe/SysML-v2-to-Modelica @ 90a3e52 :: `vehicule.sysml`](https://github.com/mimidbe/SysML-v2-to-Modelica/blob/90a3e52/vehicule.sysml#L68) | `L68: evaluate vehicle.mass;` | `mismatched input 'vehicle' expecting {default, :=, ;, =, {}` | **A** | v2 §8.2.2.6 关键字表无 `evaluate`。要表达"求值"用 `calc`/`return`/expression 调用：`return vehicle.mass;` 或在 `calc def` 内组织表达式 |
+
+##### 在 §3.6.3 Python harness 上的最小可复现验证
+
+每一类失败在剥离上下文的最小片段上独立复现（实测命令见 §3.6.3）：
+
+```python
+# A 类（actor 顶层）：
+test("package P { actor Doctor; }")           # FAIL
+test("package P { use case def C { actor Doctor : Person; } part def Person; }")  # OK
+
+# B 类样例：
+test("package P { import SI::*; attribute m = 5[SI::kg]; }")    # OK   (spec 形式)
+test("package P { import SI::*; attribute m = 5@[SI::kg]; }")   # FAIL (@ + [)
+test("package P { alias Torque for ISQ::TorqueValue; }")        # OK
+test("package P { alias ISQ::TorqueValue as Torque; }")         # FAIL
+test("package P { requirement def <'Req001'> R {} }")           # OK
+test("package P { requirement def id 'Req001' R {} }")          # FAIL
+
+# C 类（三引号字符串）：词法器在 `"""` 直接进入字符串状态，遇到换行 + 嵌入 `"` 再退出，
+#   导致 token 跨行裂为残破字符串 + 无效字符。
+
+# D 类（保留字作 ID）：
+test("package P { attribute def F { classifier: String; } }")    # FAIL
+test("package P { attribute def F { 'classifier': String; } }")  # OK   (unrestricted)
+```
+
+##### daltskin 的能力边界声明
+
+综合上述测试与失败分析，daltskin/sysml-v2-grammar `2026.03.2` 的能力边界明确为：
+
+| 接受 | 拒绝（已实测） |
+|---|---|
+| ✓ 严格匹配 OMG SysML 2.0 Final（`formal/26-03-02`）文本语法 | ✗ SysML v1 BDD/IBD textual notation（DFKI 风） |
+| ✓ 文件扩展名 `.sysml`（顶层为 `package`、`part def`、`requirement def` 等 SysML 关键字） | ✗ 文件扩展名 `.kerml`（顶层 `abstract classifier` / `class` 等 KerML 直声明） |
+| ✓ Pilot 标准库 `Systems Library/*.sysml`（58/58 实测全过） | ✗ Pilot 标准库 `Kernel Libraries/.../*.kerml`（0/36，见 §3.6.5） |
+| ✓ OMG 训练库全部 100 个范例（100/100 实测全过） | ✗ Beta1 / Beta2 阶段已弃语法（`alias as`、`id 'X'`、`@[unit]`） |
+| ✓ Apollo 11 / INSPECTA / Sensmetry Advent / LinkedIn / Praxis 等真实工程模型 | ✗ Cameo / Modelica / Python 等他生态借来的语法（`&&`、`"""`、`evaluate`） |
+| ✓ ANTLR4 4.13.x runtime 在 Java / Python / JavaScript / 任一 ANTLR4 target | ✗ 用户实现的私有扩展、未注册保留字作裸标识符 |
+
+**实践建议**：把 daltskin 嵌入 LSP / CI / lint 工具时，建议**先在收到的输入上做扩展名分诊**——`.sysml` 走 daltskin，`.kerml` 走 sireum 或 Pilot Xtext；并对碰到 §3.6.8 表中 B 类语法直接给出"v1/Beta 已弃语法，请改用 X"的诊断信息（这本身就是一个规则集明确、立项门槛低的 lint 工具机会，详见 [09-缺口与机会 §A.1](09-gaps-opportunities.md#a1-eslint-风格-sysml-v2-linter)）。
 
 ### 3.7 推荐复用清单
 
