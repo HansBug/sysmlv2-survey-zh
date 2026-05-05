@@ -174,6 +174,7 @@
 - <a id="vendor-ansys-sam"></a>**[vendor-ansys-sam]** Ansys. *SAM 2026 R1 — Advancing MBSE*. <https://www.ansys.com/blog/advancing-mbse-ansys-sam-2026-r1>
 - <a id="vendor-vp-sysmlv2"></a>**[vendor-vp-sysmlv2]** Visual Paradigm. *SysML v2 Studio*. <https://updates.visual-paradigm.com/releases/sysml-v2-studio-competitive-advantages-launch/>
 - <a id="webel-sysmlv2"></a>**[webel-sysmlv2]** Webel. *SysML v2 资源汇总*. <https://www.webel.com.au/sysml/sysmlv2>
+- <a id="vendor-modelcopilot-platform"></a>**[vendor-modelcopilot-platform]** WSE-Laboratory (BUAA). *ModelCopilot Platform* — 闭源 Web SPA，平台代码暂未开源（仓库 `WSE-Laboratory/WSE-ModelCopilot` 截至 2026-05-05 仍为占位状态）。HTTP-only 部署位于 `http://116.204.36.247`，对外开放注册。前端为 Vue 3 + Element Plus（bundle `index-DrCKs0sc.js`，1.17 MB），后端为 Spring Boot + MongoDB；可视化引擎为 PlantUML（base64 SVG）。本快照采样于 2026-05-05；详细实测见 [docs/13](13-modelcopilot-platform-walkthrough.md)。
 
 ## 6 同类建模语言基础设施（baseline 对照）
 

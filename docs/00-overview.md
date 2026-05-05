@@ -30,7 +30,7 @@ OMG SysML v2 自 2017 年立项[^seidewitz-2017]、2023 年起进入 Beta 公开
 
 所有代理独立工作、互不干扰；最终结果由维护人（[@HansBug](https://github.com/HansBug)）合并、勘误、统一引用规范。引用规范见 [AGENTS.md §3](../AGENTS.md)。
 
-## 3 12 章导航地图
+## 3 13 章导航地图
 
 | # | 文档 | 一句话定位 | 适合谁 |
 |---|---|---|---|
@@ -47,6 +47,7 @@ OMG SysML v2 自 2017 年立项[^seidewitz-2017]、2023 年起进入 Beta 公开
 | 10 | [daltskin 深度审计](10-daltskin-deep-audit.md) | daltskin/sysml-v2-grammar 全仓 36 commits + 11 模块逐一摸过 + 跑通；vibe-coding 12 信号检测全过；上下游依赖图；接入策略 (A/B/C/D) 推荐 (C) git submodule 工具链全自建 | ANTLR 工具链负责人、立项 |
 | 11 | [真实世界 v2 代码语料](11-real-world-corpora.md) | 40 公开仓 × 3255 .sysml 实测；daltskin 通过率 94.7%；工具签名分布；OTHER 类失败 Beta1/2 已弃语法清单；6 个旗舰语料 + 5 stress-test + 3 应剔除 | LLM 微调/评测、conformance baseline 选定 |
 | 12 | [ModelCopilot / WSE-Lab 深度档案](12-modelcopilot-deep.md) | 北航 WSE-Lab + ModelCopilot 平台全景；8 仓库逐项深读（PSUM-SysMLv2 7 案例、LLM4MDE 254 篇 SLR、IsingBench 4 求解器+3 经典 SE 数据集等）；arXiv 2602.21641 PSUM 解剖；公众号现状；与 OMG/华望/Cameo/Loughborough 战略对位；6 月/1 年/3 年走向预测 | 跟踪国内 SysML v2 学术节点；与 BUAA 合作前必读 |
+| 13 | [ModelCopilot 平台实测走查](13-modelcopilot-platform-walkthrough.md) | 直接登录 `116.204.36.247` 的端到端 32 轮自动化探索；UI 全景图谱（File 5 项 / Run 3 项 / Settings 5 控件）；7 种视图真实 SVG 渲染样本；6 端点 API 完整契约；Spring Boot + MongoDB 后端指纹；PSUM 集成度仅 28% 的实测；i18n 字典暴露的 dead code 清单（`openAiAssistant`/`copilot.autoCompletion` 等）；docs/12 自报指标对照核验；20 张图文步骤指引 | docs/12 实测验证；想用平台前必读；想反查 Pilot 与 ModelCopilot 同源性 |
 | ★ | [参考文献](references.md) | 全部 cite key 集中索引（标准 / 论文 / OSS / 商用 / 教程 / Baseline） | 找原文出处 |
 
 ## 4 生态分层
@@ -117,7 +118,7 @@ OMG SysML v2 自 2017 年立项[^seidewitz-2017]、2023 年起进入 Beta 公开
 - **架构师 / 工具链负责人**：**00 + 04 + 10 + 11** + 选读 06/07——理解 ANTLR4 文法接入、daltskin 工程现状、真实语料覆盖度。耗时 ~1 小时。
 - **形式化工程师 / 学术研究者**：**00 + 02 + 05** + 选读 01/09——文献索引 + 形式化路径评估。耗时 ~1 小时。
 - **AI / LLM 工程师**：**00 + 02（LLM 维度）+ 06（MCP）+ 11（语料推荐）+ 09 §A**——LLM × SysML 论文 + 数据集 + 工具链空白。耗时 ~45 分钟。
-- **中文学术圈合作 / 北航相关方**：**00 + 03 + 02**——把握北航实情 + 完整文献。耗时 ~30 分钟。
+- **中文学术圈合作 / 北航相关方**：**00 + 03 + 12 + 13**——把握北航实情 + WSE-Lab 学术档案 + ModelCopilot 平台实测。耗时 ~1.5 小时。
 - **立项做 lint / IDE 工具**：**04 + 09 §A.1 + 11 §6.4**——明确语法边界 + 失败模式 → lint 规则。耗时 ~45 分钟。
 - **立项做 KerML 形式化研究**：**01 + 05 + 02 §1 语义** + 09 §C.1——从语言结构到证明工程。耗时 ~1.5 小时。
 
