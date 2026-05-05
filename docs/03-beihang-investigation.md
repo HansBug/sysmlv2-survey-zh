@@ -11,10 +11,12 @@
 - 国内商用 MBSE 厂商（杭州华望、索为系统、安世亚太等）目前到了什么程度？谁是国内**唯一**已上线的 SysML v2 商业平台？
 
 > **本章核心新发现**：
-> 1. **鲁金直**（北航航空学院副教授、2023 入职）是中国 MBSE 国家标准 [GB/T 45803-2025][^gb-45803] 的核心起草人之一，也是 KARMA 语言发明者 + 中国 MBSE 联盟对外合作主任委员——这位在原版调研中被遗漏的关键人物，把"北航 SysML/MBSE 力量"从 4 人扩到 5 人，且是**国家级**层面而非论文层面。
-> 2. **国家标准 GB/T 45803-2025**（2025-05 发布、2025-12 实施）选择了**自研 KARMA 路径**作为中国 MBSE 国家标准底座，与 OMG SysML v2 / KerML **平行而非简单跟随**——这是中国 MBSE 工具厂商接下来要应对的"双轨合规"格局。
-> 3. **杭州华望 M-Design v2**（2025-09-14 首发 alpha）是**国内唯一**公开商业化的 SysML v2 平台，背后是浙大刘玉生团队孵化；同期出版的[《精华透视：SysML v2》][^huawang-book]（科学出版社 ISBN 9787030838780）是**国内首部** SysML v2 中文专著。
-> 4. **北航 SysML/MBSE 力量横跨 5 个学院**：计算机学院（吴际、岳涛、张莉、胡春明）+ 软件学院（葛宁、任磊、陶飞）+ 航空学院（鲁金直）+ 可靠性与系统工程学院（康锐、王自力）+ 机械工程学院（刘继红）。这种横向矩阵让北航成为中国 MBSE 联盟里**人数最多、覆盖最全**的高校节点。
+> 1. **WSE Laboratory + ModelCopilot 平台**（**第三轮新发现**）：岳涛 + 张曼在北航的研究组**有一个对外品牌叫 WSE-Lab（Software Engineering Elevated）**，自有官网 [modelcopilot.org][^modelcopilot]、GitHub 组织 [github.com/WSE-Lab][^wse-lab-gh]（8 个公开仓库）、自有微信公众号 **ModelCopilot**。WSE-Lab 实验室目前 **17 人**（教授 1 + 副教授 1 + PhD 2 + MEng 11 + BEng 3 + 访问 1），其旗舰平台 ModelCopilot 已实现 KerML **95.6%（239/250 元素）+ SysML v2 87.9%（452/514 元素）**。详见 §2.7。
+> 2. **鲁金直**（北航航空学院副教授、2023 入职）是中国 MBSE 国家标准 [GB/T 45803-2025][^gb-45803] 的核心起草人之一，也是 KARMA 语言发明者 + 中国 MBSE 联盟对外合作主任委员——这位在原版调研中被遗漏的关键人物，把"北航 SysML/MBSE 力量"从 4 人扩到 5 人，且是**国家级**层面而非论文层面。
+> 3. **国家标准 GB/T 45803-2025**（2025-05 发布、2025-12 实施）选择了**自研 KARMA 路径**作为中国 MBSE 国家标准底座，与 OMG SysML v2 / KerML **平行而非简单跟随**——这是中国 MBSE 工具厂商接下来要应对的"双轨合规"格局。
+> 4. **杭州华望 M-Design v2**（2025-09-14 首发 alpha）是**国内唯一**公开商业化的 SysML v2 平台，背后是浙大刘玉生团队孵化；同期出版的[《精华透视：SysML v2》][^huawang-book]（科学出版社 ISBN 9787030838780）是**国内首部** SysML v2 中文专著。
+> 5. **北航 SysML/MBSE 力量横跨 5 个学院**：计算机学院（吴际、岳涛、张莉、胡春明）+ 软件学院（葛宁、任磊、陶飞）+ 航空学院（鲁金直）+ 可靠性与系统工程学院（康锐、王自力）+ 机械工程学院（刘继红）。这种横向矩阵让北航成为中国 MBSE 联盟里**人数最多、覆盖最全**的高校节点。
+> 6. **岳涛个人画像更新**：DBLP PID 实际为 `40/7423-2`（**226 篇**论文，非"80+"），h-index ≈ 41，引用 ≈ 5683；研究主题分布 **量子软件 30% / 数字孪生 20% / 自动驾驶测试 20% / 不确定性建模 15% / 搜索式 SE 10% / LLM × SE 5%（增长）**；最高频合作者 **Shaukat Ali（190 篇）/ Paolo Arcaini（42）/ Man Zhang（22）/ Lionel Briand（18，博士导师）**。详见 §3.2。
 
 ## 1 调研动机与方法
 
@@ -107,6 +109,108 @@
 
 北航航空学院 + 中国空间技术研究院（航天五院）合作发表《**基于模型的载人航天器研制方法研究与实践**》[^zhang-2020-aircraft]——张柏楠（通讯）、**戚发轫（中国工程院院士）**、邢涛、刘洋、王为，航空学报 2020 41(7) 023967。
 
+### 2.7 WSE Laboratory + ModelCopilot 平台深读
+
+> **关键事实**：岳涛 + 张曼在北航的研究组运营一个独立对外品牌 **WSE-Lab（Software Engineering Elevated Laboratory）**，但**北航学院主页未列出该实验室**——它通过自有官网 + GitHub 组织 + 微信公众号三位一体存在。这是这次第三轮调研最重要的新发现，**是中国 SysML v2 / KerML 生态最活跃的高校学术节点**。
+
+#### 2.7.1 实验室基本面
+
+| 维度 | 信息 |
+|---|---|
+| 名称 | **WSE Laboratory（WSELab）** = Software Engineering Elevated Laboratory |
+| 官网 | <https://www.modelcopilot.org/>（域名 `wse-lab.github.io` 已 301 重定向至此）[^modelcopilot] |
+| GitHub 组织 | <https://github.com/WSE-Lab>，创建于 2024-09-04，**8 个公开仓库**[^wse-lab-gh] |
+| 微信公众号 | **ModelCopilot**（搜狗微信确认 ≥1 篇推文，未做企业认证；`gh_xxx` ID 需扫描 modelcopilot.org 首页二维码获取） |
+| 地址 | 北京市海淀区学院路 37 号（北航学院路校区） |
+| 联系邮箱 | yuetao@buaa.edu.cn / manzhang@buaa.edu.cn |
+| 团队规模 | **17 人**（教授 1 + 副教授 1 + PhD 2 + MEng 11 + BEng 3 + 访问学者 1） |
+
+#### 2.7.2 团队成员
+
+| 角色 | 姓名 | 在 WSE-Lab 中的分工 |
+|---|---|---|
+| 教授（PI） | **岳涛 Tao Yue** | PSUM / SysML v2 / OMG 标准侧；详细画像见 §3.2 |
+| 副教授 | **张曼 Man Zhang** | AI-based 软件测试主线；EvoMaster 重要作者；REST API fuzzing 与 AV 测试[^manzhang-dblp] |
+| PhD | **Yunyang Li** | ModelCopilot 后端：语法解析、语义校验 |
+| PhD | **Haoyang Li** | ModelCopilot 后端：可解释 AI、模型校验 |
+| MEng（11 人） | Zhetao Sun, Xijun Liu（解析） · Pengcheng Hao, Yuhan Yang（可视化） · Peiru Li, Jiarong Dong（UI） · Hongjie Xie, Fengxu Gu, Jiayi Yan, Chongyang Shen, Haoyan Wang | 工程实现 |
+| BEng（3 人） | Yige Yang（解析） · Mengkun Liu · Run Yuan | 实习开发 |
+| 访问 | Beñat Iruretagoyena Andres | 承接岳涛之前 Simula 网络的欧洲方向 |
+
+#### 2.7.3 主推研究项目（3 条主线）
+
+按 modelcopilot.org 自述：
+
+1. **ModelCopilot 平台**：把 SysML v2 / KerML 模型变成"动态、上下文感知的协作者（dynamic, context-aware collaborators）"。已实现 **KerML 95.6%（239/250 元素）+ SysML v2 87.9%（452/514 元素）**；在线 demo `http://116.204.36.247`（国内 IDC IP，访问偶发不稳）。开源代码托管位 <https://github.com/WSE-Lab/WSE-ModelCopilot> 当前 **404 / "open source in progress"**。
+2. **ADS（Autonomous Driving Systems）**：动态测试用例生成与执行；与 LiveTCM 仓库对应。
+3. **Uncertainty-wise methodologies for CPS**：CPS 系统的不确定性理解与测试；与 PSUM-SysMLv2 仓库对应。
+
+#### 2.7.4 GitHub 8 仓库逐一定位（"太长不看"导航表）
+
+下表帮你快速判断每个仓库要不要点进去看。每行附**核心数据**（论文数 / 元素数 / 数据集大小）+ **跳转指引**。
+
+| # | 仓库 | 类型 | License | 体量 | 最近 push | 核心产物 | 是否值得跳转 |
+|---|---|---|---|---|---|---|---|
+| 1 | [WSE-Lab/WSE-Lab.github.io][^wse-gh-site] | 官网源码 | None | HTML | 2026-03-19 | 实验室主页静态源（部署到 modelcopilot.org） | 仅运维 / 无内容价值 |
+| 2 | [WSE-Lab/LiveTCM][^wse-gh-livetcm] | 工具占位 | None | 空 | 2025-03-25 | LiveTCM 主仓库占位（实际 demo 在 #3） | **跳过**，看 #3 |
+| 3 | [WSE-Lab/liveTCM-demo][^wse-gh-livetcm-demo] | Python + CARLA demo | None | Python | 2025-06-19，**4★** | **基于 NLP + 模型驱动的 ADS 测试规约平台** demo；7 个核心能力（树形浏览器、NL 转模型、API 自动补全、多种 oracle、场景录制、执行控制）；依赖 CARLA 0.9.15 + Chrome；MoDELS 2021 论文配套[^shi-2021-models] | **核心**：自动驾驶测试方向必看 |
+| 4 | [WSE-Lab/QuantumOpt4SE][^wse-gh-qopt-survey] | 系统综述（SLR） | LGPL-3.0 | CSV 数据 | 2026-04-12 | **76 篇精选 / 2083 初筛** "量子优化在软件工程中的应用"系统综述；含 `initial_searching.csv` + `final_selection.csv`；论文 *Quantum Optimization for Software Engineering: A Survey* 同名 | **太长不看**：核心数据见左列 76/2083 |
+| 5 | [WSE-Lab/QuantumOpt4SE-EmpiricalStudies][^wse-gh-qopt-empirical] | 实证研究数据 | GPL-3.0 | CSV | 2025-10-29 | 量子优化 SE 实证研究提取数据（`extracted_data.csv`）；与 #4 配套 | 仅当深做 QSE 实证研究 |
+| 6 | [WSE-Lab/PSUM-SysMLv2][^wse-gh-psum] | Profile + 案例 | GPL-3.0 | 385 KB，**1★** | 2026-02-27 | **PSUM-SysML v2 框架配套**：MOF XMI 抽象语法定义（`profile/`）+ 7 个 case study 原始实验结果（`case-studies/`）；引用 SysML-v2-Pilot-Implementation 作部分基础；arXiv 2602.21641 论文配套[^zhang-2026-uncertainty] | **核心**：SysML v2 不确定性建模研究必看 |
+| 7 | [WSE-Lab/IsingBench][^wse-gh-isingbench] | Python CLI 工具 | LGPL-3.0 | Python | 2026-04-13 | **测试优化 + Ising 模型** 端到端流水线：解 Test Case Selection / Test Case Minimization 两类问题；内置 3 套 benchmark 数据集（paintcontrol、gsdtsr、iof/rol）；4 种求解器（CIM / BruteForce / GA / SA）；Python 3.11+ + PyTorch + 可选 CUDA；可与文献中 QAOA 对比 | **核心**：量子启发优化 + 测试方向必看 |
+| 8 | [WSE-Lab/LLM4MDE][^wse-gh-llm4mde] | 系统综述（SLR） | GPL-3.0 | CSV | 2026-04-01 | **228 篇精选 / 2066 初筛** "LLM 在 MDE（模型驱动工程）中应用"系统综述；含 `initial_search.csv` + `final_selection.csv`；与 LLM × SysML / 形式化工程方向高度相关 | **太长不看**：核心数据见左列 228/2066 |
+
+#### 2.7.5 仓库分类与跳转优先级
+
+按方向选择性深读：
+
+**做 SysML v2 / KerML 工具或不确定性研究的人**：
+
+- 必看 #6 PSUM-SysMLv2（profile + 7 case studies + 与 OMG SysML-v2-Pilot-Implementation 集成）
+- 关注 ModelCopilot 主仓 [WSE-Lab/WSE-ModelCopilot][^wse-gh-modelcopilot] 何时开源（"in progress"）；可对该仓库设 `Watch`
+
+**做 LLM × MBSE / 形式化工程的人**：
+
+- 必看 #8 LLM4MDE（**228 篇 SLR 直接拿来当 Related Work 引文池**）
+- 不必读全文：核心数字 228/2066，覆盖年份按 CSV 内 `year` 字段过滤即可
+
+**做量子软件工程的人**：
+
+- 必看 #4 QuantumOpt4SE 综述（76 篇）+ #5 实证数据 + #7 IsingBench 工具栈
+- 三者互补：综述是文献地图，实证是数据，IsingBench 是可跑的端到端工具
+
+**做自动驾驶 / CPS 测试的人**：
+
+- 必看 #3 liveTCM-demo（NL → 测试规约的端到端 demo，含 CARLA 集成）
+- 留意 ModelCopilot 主仓后续开源——届时与 LiveTCM 形成"模型 + 测试"完整链
+
+**仅作生态了解的人**：
+
+- 跳过 #1 #2，浏览 #6 #8 README 即可了解 WSE-Lab 的研究内涵
+- 阅读 modelcopilot.org 首页 + 「ModelCopilot」公众号推文（搜狗微信搜"ModelCopilot 岳涛"）
+
+#### 2.7.6 与岳涛公开论文的对应关系
+
+WSE-Lab 8 仓库的研究方向与岳涛公开的研究主线**一一对应**：
+
+| 仓库 | 对应岳涛研究主线 | 代表论文 |
+|---|---|---|
+| ModelCopilot 平台（核心） | Model-based SE / MBE | arXiv 2602.21641（PSUM）；多篇 SoSyM / TOSEM CPS 数字孪生论文 |
+| PSUM-SysMLv2 | OMG PSUM 标准（co-chair） + Uncertainty-wise SE | arXiv 2602.21641 ; OMG PSUM 1.0 (2025-06 通过)[^omg-psum] |
+| LLM4MDE | LLM × MBE 综述 | 与 BERT 测试架构生成（ICECCS 2024）+ Reality Bites（FORGE 2024）+ NL-guided AV testing（Internetware 2025）一致 |
+| QuantumOpt4SE 系列 | 量子软件工程（QSE）—— 占她 2020+ 论文 30% 比例 | TOSEM 量子专栏 GuestEiC ; QSE Roadmap (TOSEM 2025) ; QuSBT/Quito/QuCAT/Muskit 等 8+ 工具论文 |
+| IsingBench | 量子优化 + 测试 | Test Case Minimization with Quantum Annealers (TOSEM 2025) ; QAOA for Test (TSE 2024) |
+| liveTCM-demo | 自动驾驶 / 智能软件测试 | DeepScenario, EpiTESTER, Pretrain-Prompt-Transfer, KDDT 等 20+ 论文 |
+
+#### 2.7.7 ModelCopilot ≠ "MBSE Co-Pilot"（澄清）
+
+**重要澄清**：检索 "MBSE Co-Pilot" 命中的另一项研究 *MBSE Co-Pilot: A Research Roadmap*（Wenheng Zhang 等，**Loughborough University**，Systems Engineering 2026[^mbse-copilot-loughborough]）**与 WSE-Lab 的 ModelCopilot 无关**——是英国 Loughborough 的独立研究路线图论文。两者重名巧合：
+
+- **ModelCopilot**（一个词 / 大写）= 北航 WSE-Lab 团队平台 + 公众号
+- **"MBSE Co-Pilot"**（连字符）= Loughborough 大学 Wenheng Zhang 等的 AI × MBSE 研究路线图，是论文而非工具
+
+这次调研已确认两者不存在引用 / 合作关系。
+
 ## 3 北航团队 SysML / MBSE 论文清单（2018–2026）
 
 ### 3.1 葛宁 + 胡春明 + 王远（北航软件学院）
@@ -128,7 +232,99 @@
 - *EvoCLINICAL*. ESEC/FSE 2023（与挪威癌症登记系统的产业落地）。
 - *Quantum Software Engineering: Roadmap and Challenges Ahead*（2025）。
 
-岳涛公开论文 80+ 篇，主线在 ESEC/FSE / ICSE / TSE / TOSEM 弹性测试、数字孪生、量子软件。SysML v2 是 2024 加入北航后的新分支。
+> **数据更正**：原版报告称 "80+ 论文"，第三轮深挖确认 DBLP PID `40/7423-2`[^yue-dblp]——**226 条记录**，h-index ≈ 41，Google Scholar 引用 ≈ 5683。研究主线分布（2020–2026 共 124 篇）：**量子软件工程 30% / 数字孪生与 CPS 异常检测 20% / 自动驾驶与智能软件测试 20% / 不确定性建模（含 OMG PSUM）15% / 搜索式 SE 与测试优化 10% / LLM × SE 5%（增长中）**。
+
+#### 学术服务（除 OMG SysML v2 + PSUM 联合主席外）
+
+- **TOSEM 量子软件工程专栏 Guest Editor-in-Chief**[^tosem-qse]
+- TSE / EMSE / SoSyM 编委（Associate Editor）
+- MODELS 指导委员会成员；MODELS 2019 / EASE 2021 / SSBSE 2023 主会程序委员会主席
+- SPLC 2024 / MODELS 2021 / SPLC 2022 / RE 2021 / ASE 2022 / ICST 2024 等多个 Track Co-Chair
+- **OMG PSUM 1.0 标准 2025-06 通过**[^omg-psum-1] — 提交方包括 Simula、Softeam、Thematix、88solutions、OntoAge、BRC FinTech；岳涛与 Bran Selic（OMG 元宿主）等共同推进
+
+#### 2024–2026 重要论文（节选 17 篇 / 共 33 篇）
+
+| 年 | 标题 | Venue | 标签 |
+|---|---|---|---|
+| 2026 | Simulation-based Safety Assessment of Vehicle Characteristics Variations in ADS[^pan-2026-tosem] | TOSEM 35(3) | AV/CPS testing |
+| 2026 | Fuzzing Microservices in Face of Intrinsic Uncertainties[^zhang-2026-fuzz] | CoRR | 微服务 fuzzing |
+| 2026 | Detecting and Mitigating Flakiness in REST API Fuzzing[^shen-2026-flaky] | CoRR | API testing |
+| 2025 | Quantum Circuit Mutants: Empirical Analysis[^mendiluze-2025-emse] | EMSE 30(3) | quantum testing |
+| 2025 | Uncertainty Propagation from Sensor Data to DL Models in AV[^wang-2025-ist] | IST 183 | uncertainty/AV |
+| 2025 | Test Case Minimization with Quantum Annealers[^wang-2025-tosem] | TOSEM 34(1) | quantum/SBSE |
+| 2025 | A 2030 Roadmap for Software Engineering[^pezze-2030] | TOSEM 34(5) | 路线图 |
+| 2025 | Quantum Software Engineering: Roadmap and Challenges Ahead[^murillo-qse-roadmap] | TOSEM 34(5) | QSE 16 国/16 作者大联盟 |
+| 2025 | Defining and Generating Multi-level Uncertainty-wise Test Oracles for CPS[^valle-2025-sosym] | SoSyM 24(3) | uncertainty/CPS |
+| 2025 | A Natural Language Guided Adaptive Model-based Testing Tool for AV[^zhang-2025-internetware] | Internetware | LLM/AV testing |
+| 2024 | EpiTESTER: Testing AV With Epigenetic Algorithm and Attention[^lu-2024-tse] | TSE | AV testing |
+| 2024 | Pretrain, Prompt, and Transfer: Evolving Digital Twins for Time-to-Event Analysis in CPS[^xu-2024-tse] | TSE | digital twin |
+| 2024 | Mitigating Noise in Quantum Software Testing Using ML[^muqeet-2024-tse] | TSE 50(11) | quantum/ML |
+| 2024 | Quantum Approximate Optimization Algorithm for Test Case Optimization[^wang-2024-tse] | TSE 50(12) | QAOA |
+| 2024 | Test Architecture Generation by Leveraging BERT and Control/Data Flows[^wang-2024-iceccs] | ICECCS | LLM/test，**与吴际合著** |
+| 2024 | Reality Bites: Assessing the Realism of Driving Scenarios with LLMs[^wu-2024-forge] | FORGE | LLM/AV |
+| 2024 | Scoping Software Engineering for AI: The TSE Perspective[^uchitel-2024-tse] | TSE 50(11) | SE4AI 立场（40+ 作者） |
+
+#### 高引用经典（节选 2010–2023）
+
+| 年 | 标题 | Venue | 引用 |
+|---|---|---|---|
+| 2011 | A Systematic Review of Transformation Between User Requirements and Analysis Models[^yue-2011-review] | RE Journal | **255** |
+| 2016 | Understanding Uncertainty in CPS: A Conceptual Model[^zhang-2016-cps] | ECMFA | **197** |
+| 2013 | Facilitating the Transition from Use Case Models to Analysis Models[^yue-2013-tosem] | TOSEM | 162 |
+| 2016 | A Practical Guide to Select Quality Indicators for Pareto-Based Search[^ali-2016-icse] | ICSE | 149 |
+| 2017 | Model-Based Security Engineering for CPS[^yue-2017-ist] | IST | 142 |
+| 2021 | Digital Twin-based Anomaly Detection in Cyber-physical Systems[^xu-2021-icst] | ICST | **144** |
+| 2022 | When Software Engineering Meets Quantum Computing[^ali-2022-cacm] | CACM 65(4) | 108 |
+| 2014 | Traceability and SysML Design Slices to Support Safety Inspections[^yue-2014-tosem] | TOSEM | 72 |
+
+#### 核心合作网络（DBLP 合著次数 Top 10）
+
+| 合著篇数 | 合作者 | 现职 / 角色 |
+|---|---|---|
+| **190** | **Shaukat Ali** | Simula Chief Research Scientist；岳涛 18 年最紧密搭档[^ali-simula] |
+| **42** | **Paolo Arcaini** | NII Tokyo Associate Professor；search-based testing / QSE / ADS[^arcaini-nii] |
+| **22** | **Man Zhang 0001 张曼** | **WSE-Lab 副教授（北航）+ 兼挪威 Kristiania UC**；REST API fuzzing / EvoMaster |
+| **21** | **Shuai Wang 0001** | Simula 前博士后；多目标搜索 / Cisco 工业实践 |
+| **18** | **Lionel Briand** | uOttawa Tier-1 Canada Research Chair；**岳涛博士导师**；ACM/IEEE Fellow[^briand] |
+| **17** | **Huihui Zhang 0003** | 2017 北航博士（岳涛 + 刘超联合指导） |
+| **16** | **Xinyi Wang 0004** | Simula PhD；量子软件测试主力（QuSBT/Quito/QuCAT） |
+| **15** | **Hong Lu 0005** | 2013–2016 北航博士、2016 起 Simula Research Fellow |
+| **14** | **Chengjie Lu** | Simula PhD；ADS 测试 |
+| **13** | **Christoph Laaber** + **Marius Liaaen**（Cisco Norway）+ **Li Zhang**（北航软件学院张莉） | 三位并列 |
+
+#### 工业合作伙伴（论文署名出现）
+
+| 公司 / 机构 | 国家 | 关联人 | 论文主题 |
+|---|---|---|---|
+| **Cisco Systems Norway** | 挪威 | Marius Liaaen | 视频会议产品线测试（**9 年**合作） |
+| **ULMA Embedded Solutions** | 西班牙 | Maite Arratibel | 工业电梯数字孪生 |
+| **Cancer Registry of Norway** | 挪威 | Jan F. Nygård / Thomas Schwitalla | 医疗规则系统、癌症登记数字孪生 |
+| **Apexart Solutions** | 挪威 | Kjetil Moberg | 医疗 IoT 用药分配器 |
+| **ABB / Equinor / 挪威医疗** | 挪威 | （早期项目） | 产品线、不确定性 |
+| **IBM Quantum** | 平台 | — | 噪声缓解 |
+
+#### Simula 时期重大项目（基金体现于论文致谢）
+
+- **U-Test** EU 项目 — 不确定性 CPS 测试（2015–2018）
+- **Zen-Configurator (No. 240024)** — 挪威研究理事会；产品线配置
+- **AIT4CR** — Cancer Registry of Norway 测试基础设施
+- **Co-tester / IND-LIFT / Tugendwald / IM4QN** — 挪威工业资助
+- **Simula × Cisco Norway 9 年战略合作**
+
+#### 学生（北航 2023 起，按 2024–2026 一作署名推断）
+
+| 一作 | 论文 / 题目 | 角色推测 |
+|---|---|---|
+| **Qi Pan** | 2026 TOSEM "SAFEVAR" ADS 安全评估 | 北航博士 / Yue 主线 |
+| **Jianwei Ma** | 2026 TOSEM 同上 | 同 |
+| **Yifan Wang** | 2025 IST 不确定性传播 AV | 北航 / 南航学生 |
+| **Chao Tan** | 2025 SoSyM 安全行为抽象 | 南航联合 |
+| **Peiru Li / Yize Shi** | 2025 Internetware NL Adaptive AV Testing | 团队成员，亦在 §2.7.2 WSE-Lab 名单 |
+| **Chongyang Shen** | 2026 CoRR REST API flakiness | 团队 / 学生，亦在 WSE-Lab 名单 |
+| **Guangyu Wang** | 2024 ICECCS BERT 测试架构 | **吴际 + 岳涛 共带** |
+| **Yunyang Li / Haoyang Li** | 列于 §2.7.2 WSE-Lab，但在主流会议尚未出现作 | 北航博士在读 |
+
+> **观察**：岳涛 2023 入职北航，2024–2026 论文中已经出现一批 BUAA / NUAA 地址的中国新一作，与 Simula 体系的旧博士（Lu / Xu / Wang / Sartaj 等）形成"两套学生池"格局；WSE-Lab 网站列出的 11 名硕士 + 3 名本科多数还未在主流会议出现首作，将是未来 1–2 年的产出窗口。
 
 ### 3.3 鲁金直 + 北理工合作（中国 MBSE 联盟主轴）
 
@@ -140,6 +336,89 @@
 ### 3.4 早期历史性工作（v1 时代）
 
 - **[yue-2014-tosem]** Yue T. *et al.* (2014). *Traceability and SysML Design Slices to Support Safety Inspections*. ACM TOSEM[^yue-2014-tosem]。BUAA + Simula 合作，岳涛在 Simula 期间已有与北航的合作发表。
+
+### 3.5 吴际 Ji Wu（北航计算机学院）—— 2022–2026 完整论文画像
+
+DBLP `91/4957-3`[^wu-dblp] 共 56 篇。**与岳涛合著 11 篇**。研究方向：**机载软件适航 / 微服务测试 / LLM 辅助需求与测试 / 软件工作量估算**。是 OMG PSUM 中**唯一来自中国大陆的 Working Group 成员**（Beihang University 代表）[^omg-psum]。
+
+| 年 | 标题 | Venue | 共同作者 |
+|---|---|---|---|
+| 2025 | Advancing Software Project Effort Estimation: Leveraging a NIVIM | J. Softw. Evol. Process. | Sarmad Ali, Jian Ren, **Wu**, Kui Zhang, Chao Liu |
+| 2025 | BFGen: Basic Flow Generation for Refining Requirements via LLM and RGAT[^wu-2025-bfgen] | QRS | Guangyu Wang, Bangqi Li, **Wu**, Zhijun Shao |
+| 2024 | Test Architecture Generation by Leveraging BERT and Control/Data Flows[^wang-2024-iceccs] | ICECCS | Guangyu Wang, **Wu**, Haiyan Yang, Qing Sun, **Yue T.** |
+| 2024 | Framework to Improve Software Effort Estimation | J. King Saud Univ. | Sarmad Ali, Jian Ren, **Wu** |
+| 2023 | Heterogeneous Ensemble Model to Optimize SE Effort Estimation | IEEE Access | Sarmad Ali, Jian Ren, Kui Zhang, **Wu**, Chao Liu |
+| 2023 | Microservice Regression Testing Selection Based on Belief Propagation | J. Cloud Comput. | Lizhe Chen, **Wu**, Haiyan Wang, Kui Zhang |
+| 2022 | Editorial: Open Environmental Software Systems Modeling | SoSyM 21(4) | **Yue T.**, P. Arcaini, **Wu**, Xiaowei Huang |
+| 2022 | Does PageRank Apply to Service Ranking in Microservice Regression Testing? | Softw. Qual. J. | Lizhe Chen, **Wu**, Haiyan Yang, Kui Zhang |
+| 2022 | SRTEF: Test Function Recommendation w/ Scenarios and Latent Semantic[^wu-2022-srtef] | IEEE Trans. Reliab. | Kaiqi Liu, **Wu**, Haiyan Yang, Qing Sun, Ruiyuan Wan |
+| 2022 | Feature Difference Based Misclassified Sample Detection for CNN | QRS Companion | Changtian He, Qing Sun, **Wu**, Haiyan Yang, **Yue T.** |
+
+### 3.6 葛宁 Ning Ge（北航软件学院 先进工业软件研究所）—— 2022–2026 完整论文画像
+
+研究方向：**形式化方法 + LLM × SysML / Lustre / MOM 工业语言生成、可信赖航空软件**。是北航 LLM × MBSE 主线核心 PI。
+
+| 年 | 标题 | Venue | 备注 |
+|---|---|---|---|
+| 2026 | LusGen: Leveraging LLMs for Safety-Critical Lustre Design and Requirements Traceability[^jiang-2026-fase] | FASE 2026 | 形式化语言 + LLM 追踪 + 安全关键设计 |
+| 2026 | Synergy of Formal Semantics and Industrial Data Analytics for Manufacturing | J. Circuits Syst. Comput. | — |
+| 2025 | Generating SysML Behavior Models via Large Language Models: An Empirical Study[^wang-2025-internetware] | Internetware 2025 | 107 SysML 行为模型 + 17 LLM 评测幻觉 |
+| 2025 | DReM: Efficiently Generating Domain-Specific Requirements Modeling Tool[^ge-2025-drem] | FSE | 工具自动化生成 |
+| 2025 | SemServGen: Advancing Industrial Domain-Specific Language Engineering[^ge-2025-semservgen] | FSE | 工业 DSL 自动化 |
+| 2025 | Learning Splitting Heuristics in Divide-and-Conquer SAT Solvers | ICLR | — |
+| 2025 | Constructing and Evaluating Domain-Specific Synthetic QA Datasets for Airborne SE | APSEC | 适航 LLM 合成数据 |
+| 2025 | Understanding the Challenges and Requirements for Facilitating iStar Learning | IST | — |
+| 2024 | LoRaWAN Protocol Security Verification Framework | ISSRE | — |
+| 2024 | Formal Foundations for Efficient Simulation of MOM Systems | ICTAC | 工业 MOM 形式化 |
+| 2023 | AutoMTLSpec: Learning to Generate MTL Specifications | ECCS | LLM × 时序逻辑 |
+| 2023 | HOME: Heard-Of based Formal Modeling Environment | ICSE demo | — |
+| 2022 | Towards the Practical Adoption of LIDL | MoDELS | — |
+| 2022 | ArchTacRV: Detecting and Runtime Verifying Architectural Tactics | SANER | 运行时验证 |
+| 2022 | MC-FLoc: Learning from Traces to Locate Fault in Petri Net Model Checking | ISSRE | — |
+
+> **观察**：葛宁 + 王远（合作者）+ 胡春明（合著）三人组在 2025–2026 集中发出 SemServGen、DReM、LusGen、SysML Behavior Models via LLMs 四篇 LLM × MBSE 论文，是**中国 LLM × MBSE 方向最系统的产出**。与岳涛 WSE-Lab 形成北航内"两个 LLM × 模型工程"团队。
+
+### 3.7 鲁金直 Jinzhi Lu（北航航空学院）—— 2022–2026 KARMA 主线扩展
+
+代表论文除 §2.3 已列 11 篇外，2022–2026 完整数据点：
+
+| 年 | 标题 | Venue | 备注 |
+|---|---|---|---|
+| 2024 | KARMA Approach Supporting Development Process Reconstruction in MBSE | CSD&M | KARMA 工程化 |
+| 2022 | Cognitive Digital Twin × Decision Manufacturing | Int. J. Prod. Res. | 引 127 |
+| 2022 | KARMA-based Production Scheduling SMT | J. Ind. Inf. Integr. | KARMA × 工业调度 |
+| 2022 | Cognitive Digital Twin Concept Framework | Information | — |
+| 2023 | Ontology-based Engineering System for Aircraft Manufacturing | J. Manuf. Syst. | 引 113 |
+| 2024 | Mission-Oriented Electric Aircraft Propulsion | J. Eng. Gas Turb. | — |
+| 2024 | MBSE for Assembly | Adv. Eng. Inf. | — |
+| 2025 | INCOSE IS 2025 *Semantic Model-Based Systems Engineering Based on KARMA: A Research and Practice Roadmap* | INCOSE IS 2025 | KARMA 路线图 |
+| 2025 | Towards Intelligent MBSE: Constructing an MBSE Model Dataset for Generative AI | Springer 2025 | LLM × KARMA |
+| 2025 | Cognitive Digital Thread Tool-Chain for Model Versioning in MBSE | SSRN 2025 | 与 Shouxuan Wu, Guoxin Wang, Yan Yan 合作 |
+| 2026 | Decentralized Digital Engineering Asset Exchange via MBSE | （preprint） | 区块链 × KARMA |
+
+### 3.8 康锐 Rui Kang（可靠性与系统工程学院）—— Belief Reliability 主线
+
+代表论文 2024–2025：
+
+| 年 | 标题 | Venue |
+|---|---|---|
+| 2025 | System Belief Reliability Evaluation Method Based on Uncertainty Theory | （2024-11 预出版） |
+| 2025 | Control Model–based Reliability Modeling and Analysis of Human Baroreflex Regulation Function | Annals of NYAS |
+| 2024 | Belief Reliability Index Determination Method Based on Group Decision-Making | QREI |
+| 2024 | Belief Reliability: A Scientific Exploration of Reliability Engineering | J. Syst. Eng. Electron. 35(3) |
+| 2024 | Belief Reliability Modeling for Wind Farms with Two-Directional Rotor Equivalent Wind Speed | Symmetry |
+
+> **观察**：康锐与岳涛在 DBLP 上**无共同论文**，但 PSUM 不确定性建模与 Belief Reliability 高度对应——属"可能交叉但尚未合作"的潜在合作面。
+
+### 3.9 刘继红 Jihong Liu（机械工程学院）—— SysML 工业制造主线
+
+代表论文：
+
+- 2024 *Automatic Generation of System Model Diagrams Driven by Multi-source Heterogeneous Data: Knowledge Graph + SysML Metamodel*. J. Eng. Design[^liu-2024-knowledge-graph]。
+- 2019 *MBSE for Satellite Communication System Architecting*. IEEE Access。
+- 2025-01 主编《**基于 MBSE 的复杂装备系统设计：理论与实践**》（电子工业出版社 ISBN 9787121488344，配套自主"蕴象软件"）[^liu-mbse-book]。
+
+> **观察**：刘继红在 DBLP 上**无与岳涛的共同论文**——属北航 MBSE 队伍另一极。
 
 ## 4 候选人核查（含勘误，更新版）
 
@@ -273,20 +552,61 @@
 
 > **重要观察**：直接以 "**SysML v2**" 命名的中文期刊学术论文，截至 2026-05 仅有岳涛团队 *Uncertainty Modeling for SysML v2*（arXiv，英文）、华望团队的中文专著《精华透视：SysML v2》，以及散落的"SysML 2.0/v2"普及/解读文章。**国内对 v2 的中文期刊学术化滞后于工程产业化**——专著与厂商博客先行，CNKI 学术圈尚在跟进。
 
-## 8 微信公众号 / 知乎 / CSDN 中文社区生态
+## 8 微信公众号 / 知乎 / Bilibili / CSDN 中文社区生态
 
-| 渠道 | 名称 / ID | 运营方 | 覆盖度 | 链接 |
-|---|---|---|---|---|
-| 微信公众号 | **UMLChina** (umlchina2) | 潘加宇（创始人，前清华教师）；2002 年成立 | UML / SysML / MBSE 培训类，长期更新；潘加宇还在知乎写《SysML v2 规范逐段解读》系列（2025 起） | [umlchina.com][^umlchina] |
-| 微信公众号 | **复杂装备 MBSE 生态** | 复杂装备 MBSE 联盟（北航 + 北理工 + 商飞 + 上海宇航研究所） | 启航杯赛事、联盟动态、国标进展 | [mbse-alliance.com][^chinambse] |
-| CSDN / 知乎机构号 | **杭州华望 MBSE** (`HZHW_MBSE`) | 杭州华望系统科技 | 截至 2026-04 共 77+ 篇原创，560 粉丝，访问量 8.8 万；SysML v2 / v1→v2 迁移、M-Design v2、AI+MBSE 系列 | [blog.csdn.net/HZHW_MBSE][^huawang-csdn]；[zhihu.com/org/...][^huawang-zhihu] |
-| 中文门户 | **模型巴巴 modelbaba.com** | 独立 MBSE 中文知识平台（运营方未公开署名） | MBSE / SysML / DoDAF / UPDM / UAF / PLM / ALM / AADL 全谱涵盖；活跃发文 | [modelbaba.com/posts][^modelbaba] |
-| 中文门户 | **建模者 / UMLChina 系列** uml.org.cn / sysml.org.cn / modeler.org.cn / 火龙果软件 | 同源系列（UMLChina 旗下） | SysML v2 建模元素解析、UAF 培训等 | [uml.org.cn][^uml-china-zh] |
-| 微信公众号 | **MBSE 联盟** 官方号 | 中国 MBSE 联盟 | 联盟通知、启航杯、对外培训 | mbse-alliance.com |
-| 微信公众号 | **科学出版社专业图书** (sciencepress-cspm) | 科学出版社 | 周边推广华望专著 | — |
-| 知乎专栏 | 潘加宇《SysML v2 规范逐段解读》、华望团队《SysML V2 对 V1 的改进》《SysML V2 的元数据》《SysML V2 的模型组织》 | 潘加宇 + 华望 | 截至 2026-05 至少有 8 篇 v2 中文长文 | zhihu.com 多个 zhuanlan |
+### 8.1 微信公众号
 
-> **观察**：没找到独立、纯学术、专攻 SysML v2 的国内微信公众号；公众号生态以**厂商 + 联盟**驱动为主。学术圈传播主要靠知乎、CSDN、官方期刊。
+| 名称 / ID | 运营方 | 性质 | 覆盖度 |
+|---|---|---|---|
+| **ModelCopilot**（**新发现**） | 北航 WSE-Lab（岳涛 + 张曼） | 学术实验室对外品牌，未做企业认证 | 已确认 ≥1 篇推文《基于新一代 SysML 的不确定性建模》；与 GitHub `WSE-Lab` 组织 + 论文 arXiv 2602.21641 一致；详见 §2.7 |
+| [UMLChina][^umlchina] (umlchina2) | 潘加宇（创始人，前清华教师）；2002 成立 | 培训 + 个人长期运营 | UML / SysML / MBSE 培训类；潘加宇在知乎写《SysML v2 规范逐段解读》系列（2025 起，首篇 [zhuanlan.zhihu.com/...][^pan-sysml-zhihu]） |
+| **复杂装备 MBSE 生态** | 复杂装备 MBSE 联盟（北航 + 北理工 + 商飞 + 上海宇航研究所） | 联盟官号 | 启航杯赛事、联盟动态、国标进展 |
+| **iMBSE Online** | 西门子官方 / 厂商 | 厂商号 | 西门子等 SysML v2 解决方案介绍 |
+| **系斯模科技** | 系斯模公司 | 公司号 | MBSE 与 SysML v2 战略展望 |
+| **Digital Engineering** | 媒体 | 翻译 + 评论 | 翻译 SysML v2 行业评论（如"前 BAE 专家说 SysML V2 死而不僵"） |
+| **PLM加油站** | PLM 行业 | 行业号 | Teamcenter 2512 Copilot/AI 与 SysML v2 集成 |
+| **基于3DE平台的数字化设计与制造** | 个人 | 个人技术号 | CATIA Magic SysML v2 实战、Monte Carlo 分析 |
+| **戎威特种技术转移平台** | 军工 / 转化 | 行业号 | 含 SysML v2 信息（航空电子综合技术国家级重点实验室相关） |
+| **中国CAE** | 厂商内容聚合 | 行业号 | Ansys 2026 R1 Engineering Copilot + SysML v2 |
+| **陆新征课题组**（清华土木） | 清华大学 | 个人 PI 号 | AIstructure-Copilot + Diffusion Model 智能设计——非 SysML v2，但是国内**另一独立"模型 + Copilot"PI 路线**，值得记下 |
+| **MBSE 联盟** 官方号 | 中国 MBSE 联盟 | 联盟官号 | 联盟通知、启航杯、对外培训 |
+| **科学出版社专业图书** (sciencepress-cspm) | 科学出版社 | 出版社号 | 周边推广华望《精华透视：SysML v2》专著 |
+
+### 8.2 Bilibili 视频频道
+
+| 频道 / 视频 | 播放量级 | 备注 |
+|---|---|---|
+| UMLChina「关于 SysML v2：第 01 集」 | 34,460 | 国内最大单视频 |
+| 「SysML v2 初探 2」（讲 SysIDE + AI 辅助建模） | 20,190 | 7 分钟 |
+| 「基于模型的系统工程 - MBSE - SysML」 | 19,000 | 系列概述 |
+| **MBSE 挑战者** 频道，「KerML 的演进：让机器读懂人类意图」 | 7,680 | 罕见的 KerML 中文专题视频 |
+| **杭州华望 MBSE**（机构号） | 多视频公开课系列 | — |
+| **汉德天下教学视频** | — | 教学号 |
+| **MBSE_技术分享** | — | 火箭建模 + AI 辅助 SysML 仿真 |
+| **中国自动化学会** | 29 分钟 | 刘玉生 MBSE 软件研发讲座 |
+
+### 8.3 知乎专栏
+
+- **潘加宇（UMLChina）**《SysML v2 规范逐段解读》系列（2025-08 起连载，围绕 2025-04 版规范，至少 8 篇长文）[^pan-sysml-zhihu]
+- **杭州华望** 知乎机构号 *《重磅首发｜华望首部 SysML v2 专著《精华透视：SysML v2》》*
+- 同源系列：*SysML V2 对 V1 的改进 / SysML V2 的模型组织 / SysML V2 的元数据*
+- 阿里云开发者社区 + DAMO 开发者矩阵中**苗素鹃 Rich** 的"SysML-v2 开源项目教程"
+
+### 8.4 CSDN / 博客园 / 简书
+
+| 作者 / 账号 | 平台 | 备注 |
+|---|---|---|
+| `HZHW_MBSE`（华望官方）[^huawang-csdn] | CSDN | M-Design v2 系列文章很活跃；560 粉丝、访问量 8.8 万、77+ 篇 |
+| `rolt`（图解 SysML 系列） | CSDN | 「[图解]关于 SysML v2（1）大刀阔斧 对比 伪创新圈子」等系列长文 |
+| `gitblog_*` 系列 | CSDN | 多篇"SysML v2 开源项目推荐 / 终极指南"自动生成内容 |
+| `digiproto2020` | CSDN | ModelCoder 系列（数码大方 / 类似厂商） |
+| `johnny233` | 博客园 | SysML 理论知识系列 |
+| 苗素鹃 Rich | 阿里云开发者社区 / damodev.csdn.net | SysML v2 教程 |
+
+> **观察**：
+> - **ModelCopilot 公众号**是国内**第一个**纯学术驱动的 SysML v2 公众号——但因未做企业认证、发文量小、上线时间晚（2026-02 与 arXiv 投稿同步），目前覆盖面尚小。这与 WSE-Lab 整体"国际 OMG 标准侧 footprint 极重 + 中国本土科普侧才刚起步"的状态一致（详 §2.7）。
+> - 公众号生态依然以**厂商 + 联盟**驱动为主（华望、UMLChina、复杂装备 MBSE 联盟）。学术圈传播主要靠知乎、CSDN、官方期刊。
+> - **建议**：手机微信内"搜索公众号 → ModelCopilot"翻历史消息（搜狗对未认证号收录率低），或扫描 modelcopilot.org 首页二维码进入历史消息列表。
 
 ## 9 中国开源贡献者（GitHub）
 
@@ -496,3 +816,105 @@ CNKI 复检：用 *机构 = 北京航空航天大学 + 主题词 = SysML* 检索
 [^zhirui]: 广州智睿思维 MBSES. <https://modelbaba.com/mbse/2895.html>
 
 [^anwise]: 北京安怀信. <https://anwiseglobal.com/>
+
+[^modelcopilot]: WSE Laboratory / ModelCopilot 平台官网. <https://www.modelcopilot.org/>
+
+[^wse-lab-gh]: WSE-Lab GitHub 组织主页. <https://github.com/WSE-Lab>
+
+[^manzhang-dblp]: 张曼 Man Zhang 0001 DBLP. <https://dblp.org/pid/49/5096-1.html>
+
+[^shi-2021-models]: Shi 等 *LiveTCM* 论文，MoDELS 2021. DOI 10.1109/MODELS50736.2021.00019.
+
+[^mbse-copilot-loughborough]: Wenheng Zhang 等 *MBSE Co-Pilot: A Research Roadmap* (Loughborough University)，与北航 ModelCopilot 无关. INCOSE Systems Engineering 2026, DOI 10.1002/sys.70011. <https://incose.onlinelibrary.wiley.com/doi/10.1002/sys.70011>
+
+[^wse-gh-site]: *WSE-Lab/WSE-Lab.github.io*. <https://github.com/WSE-Lab/WSE-Lab.github.io>
+
+[^wse-gh-livetcm]: *WSE-Lab/LiveTCM*. <https://github.com/WSE-Lab/LiveTCM>
+
+[^wse-gh-livetcm-demo]: *WSE-Lab/liveTCM-demo* — Python + CARLA demo for ADS testing. <https://github.com/WSE-Lab/liveTCM-demo>
+
+[^wse-gh-qopt-survey]: *WSE-Lab/QuantumOpt4SE* — 76 papers SLR. <https://github.com/WSE-Lab/QuantumOpt4SE>
+
+[^wse-gh-qopt-empirical]: *WSE-Lab/QuantumOpt4SE-EmpiricalStudies*. <https://github.com/WSE-Lab/QuantumOpt4SE-EmpiricalStudies>
+
+[^wse-gh-psum]: *WSE-Lab/PSUM-SysMLv2* — PSUM-SysML v2 framework supplementary materials. <https://github.com/WSE-Lab/PSUM-SysMLv2>
+
+[^wse-gh-isingbench]: *WSE-Lab/IsingBench* — Python CLI tool for test optimization via Ising model. <https://github.com/WSE-Lab/IsingBench>
+
+[^wse-gh-llm4mde]: *WSE-Lab/LLM4MDE* — 228 papers SLR. <https://github.com/WSE-Lab/LLM4MDE>
+
+[^wse-gh-modelcopilot]: *WSE-Lab/WSE-ModelCopilot* (open source in progress). <https://github.com/WSE-Lab/WSE-ModelCopilot>
+
+[^yue-dblp]: 岳涛 Tao Yue DBLP PID 40/7423-2 (226 records). <https://dblp.org/pid/40/7423-2.html>
+
+[^tosem-qse]: ACM TOSEM Quantum Software Engineering Special Issue (Yue Guest EiC). <https://dl.acm.org/journal/tosem>
+
+[^omg-psum-1]: OMG. *Precise Semantics of Uncertainty Modeling (PSUM) 1.0 Final Adoption*. 2025-06. <https://www.omg.org/spec/PSUM/1.0>
+
+[^pan-2026-tosem]: Pan, Q., Wang, T., Ma, J., Arcaini, P., Yue, T. *Simulation-based Safety Assessment of Vehicle Characteristics Variations in ADS*. TOSEM 35(3) 2026. DOI 10.1145/3743673.
+
+[^zhang-2026-fuzz]: Zhang, M., Yue, T., Arcuri, A. *Fuzzing Microservices in Face of Intrinsic Uncertainties*. arXiv:2603.02551 (2026).
+
+[^shen-2026-flaky]: Zhang, M., Shen, C., Arcuri, A., Yue, T. *Detecting and Mitigating Flakiness in REST API Fuzzing*. arXiv:2603.28452 (2026).
+
+[^mendiluze-2025-emse]: Mendiluze Usandizaga, E., Ali, S., Yue, T., Arcaini, P. *Quantum Circuit Mutants: Empirical Analysis*. EMSE 30(3) 2025. DOI 10.1007/s10664-025-10643-z.
+
+[^wang-2025-ist]: Wang, Y., Wang, T., Yue, T. *Uncertainty Propagation from Sensor Data to DL Models in AV*. IST 183 (2025). DOI 10.1016/j.infsof.2025.107735.
+
+[^wang-2025-tosem]: Wang, X., Muqeet, A., Yue, T., Ali, S., Arcaini, P. *Test Case Minimization with Quantum Annealers*. TOSEM 34(1) 2025. DOI 10.1145/3680467.
+
+[^pezze-2030]: Pezzè, M., Abrahão, S., Penzenstadler, B., Poshyvanyk, D., Roychoudhury, A., Yue, T. *A 2030 Roadmap for Software Engineering*. TOSEM 34(5) 2025. DOI 10.1145/3731559.
+
+[^murillo-qse-roadmap]: Murillo, J.M. 等 (16 名作者，含 Yue). *Quantum Software Engineering: Roadmap and Challenges Ahead*. TOSEM 34(5) 2025. DOI 10.1145/3712002.
+
+[^valle-2025-sosym]: Valle, P., Arrieta, A., Han, L., Ali, S., Yue, T. *Defining and Generating Multi-level Uncertainty-wise Test Oracles for CPS*. SoSyM 24(3) 2025. DOI 10.1007/s10270-025-01271-8.
+
+[^zhang-2025-internetware]: Zhang, M., Li, P., Shi, Y., Yue, T. *A Natural Language Guided Adaptive Model-based Testing Tool for AV*. Internetware 2025. DOI 10.1145/3755881.3755932.
+
+[^lu-2024-tse]: Lu, C., Ali, S., Yue, T. *EpiTESTER: Testing AV With Epigenetic Algorithm and Attention Mechanism*. TSE 2024. DOI 10.1109/TSE.2024.3449429.
+
+[^xu-2024-tse]: Xu, Q., Yue, T., Ali, S., Arratibel, M. *Pretrain, Prompt, and Transfer: Evolving Digital Twins for Time-to-Event Analysis in CPS*. TSE 2024. DOI 10.1109/TSE.2024.3388572.
+
+[^muqeet-2024-tse]: Muqeet, A., Yue, T., Ali, S., Arcaini, P. *Mitigating Noise in Quantum Software Testing Using ML*. TSE 50(11) 2024. DOI 10.1109/TSE.2024.3462974.
+
+[^wang-2024-tse]: Wang, X., Ali, S., Yue, T., Arcaini, P. *Quantum Approximate Optimization Algorithm for Test Case Optimization*. TSE 50(12) 2024. DOI 10.1109/TSE.2024.3479421.
+
+[^wang-2024-iceccs]: Wang, G., Wu, J., Yang, H., Sun, Q., Yue, T. *Test Architecture Generation by Leveraging BERT and Control and Data Flows*. ICECCS 2024. DOI 10.1007/978-3-031-66456-4_7.
+
+[^wu-2024-forge]: Wu, J., Lu, C., Arrieta, A., Yue, T., Ali, S. *Reality Bites: Assessing the Realism of Driving Scenarios with LLMs*. FORGE 2024. DOI 10.1145/3650105.3652296.
+
+[^uchitel-2024-tse]: Uchitel, S. 等（40+ 作者，含 Yue T.）. *Scoping Software Engineering for AI: The TSE Perspective*. TSE 50(11) 2024. DOI 10.1109/TSE.2024.3470368.
+
+[^yue-2011-review]: Yue, T., Briand, L., Labiche, Y. *A Systematic Review of Transformation Approaches Between User Requirements and Analysis Models*. RE Journal 2011. 引 255.
+
+[^zhang-2016-cps]: Zhang, M., Selic, B., Ali, S., Yue, T. 等. *Understanding Uncertainty in CPS: A Conceptual Model*. ECMFA 2016. 引 197.
+
+[^yue-2013-tosem]: Yue, T., Briand, L., Labiche, Y. *Facilitating the Transition from Use Case Models to Analysis Models*. TOSEM 2013. 引 162.
+
+[^ali-2016-icse]: Ali, S., Arcaini, P., Pradhan, D., Safdar, S.A., Yue, T., Li, Y., Liaaen, M. *A Practical Guide to Select Quality Indicators for Pareto-based Search*. ICSE 2016. 引 149.
+
+[^yue-2017-ist]: Yue, T., Ali, S. *Model-based Security Engineering for CPS*. IST 2017. 引 142.
+
+[^xu-2021-icst]: Xu, Q., Ali, S., Yue, T. *Digital Twin-based Anomaly Detection in Cyber-physical Systems*. ICST 2021. 引 144.
+
+[^ali-2022-cacm]: Ali, S., Yue, T., Abreu, R. *When Software Engineering Meets Quantum Computing*. CACM 65(4) 2022. 引 108.
+
+[^ali-simula]: Shaukat Ali Simula 主页. <https://www.simula.no/people/shaukat>
+
+[^arcaini-nii]: Paolo Arcaini NII 主页. <http://group-mmm.org/~arcaini/>
+
+[^briand]: Lionel Briand 主页. <https://www.lbriand.info/>
+
+[^wu-dblp]: 吴际 Ji Wu 0003 DBLP. <https://dblp.org/pid/91/4957-3.html>
+
+[^wu-2025-bfgen]: Wang, G., Li, B., Wu, J., Shao, Z. *BFGen: Basic Flow Generation for Refining Requirements via LLM and RGAT*. QRS 2025.
+
+[^wu-2022-srtef]: Liu, K., Wu, J., Yang, H., Sun, Q., Wan, R. *SRTEF: Test Function Recommendation w/ Scenarios and Latent Semantic*. IEEE Trans. Reliab. 2022.
+
+[^ge-2025-drem]: *DReM: Efficiently Generating Domain-Specific Requirements Modeling Tool*. FSE 2025. （葛宁团队）
+
+[^ge-2025-semservgen]: *SemServGen: Advancing Industrial Domain-Specific Language Engineering*. FSE 2025. （葛宁团队）
+
+[^liu-2024-knowledge-graph]: 刘继红 等. *Automatic Generation of System Model Diagrams Driven by Multi-source Heterogeneous Data: Knowledge Graph + SysML Metamodel*. J. Eng. Design 2024.
+
+[^pan-sysml-zhihu]: 潘加宇《SysML v2 规范逐段解读》系列首篇. <https://zhuanlan.zhihu.com/p/1954136350551958822>
