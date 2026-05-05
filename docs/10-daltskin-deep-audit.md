@@ -9,7 +9,27 @@
 - 哪些模块可直接 vendor / fork 复用？哪些必须自建扩展？哪些不可用？
 - 在工期约束下，正确的接入策略是 **fork 维护还是 vendor 文件**？还是直接搬 `.g4` 自管？
 
-> **结论先行**（详见 §11）：daltskin 是**单人精良维护、工程级质量**的项目；**0 vibe-coding 信号**，**0 open issues**，10 周 36 commits 节奏稳定，已合入 `antlr/grammars-v4`，下游有 10+ 项目消费。**推荐策略**：**`git submodule` 锁 commit 直接 vendor 其 `grammar/*.g4`，按需自建领域扩展（lint / KerML grammar），不寄望短期内把扩展 merge 回上游**。理由：(a) 单人维护意味着 PR 评审节奏≥1 周，工期紧追不上；(b) 只用 `.g4` 文件，license（MIT）允许任意 fork；(c) 我们扩展的领域逻辑（如 lint 规则、KerML 支持）多数也不属于上游接受范围。
+### 0.0 一句话先把全章定位讲清楚
+
+**daltskin/sysml-v2-grammar 不是一个"基础设施仓库"，是一份"被维护中的 ANTLR4 文法文件"。**
+
+把整个仓库剖开看：
+
+| 部分 | 是什么 | 真实复用价值 |
+|---|---|---|
+| `grammar/SysMLv2{Lexer,Parser}.g4` + `PATCHES.md`（约 52 KB） | **从 OMG KEBNF 跑下来 + 56 处 ambiguity patch 的 ANTLR4 文法成品** | **★★★★★**——这才是这个仓库的全部技术价值，是别处暂无替代的"产物" |
+| `scripts/`（generate_grammar.py / conformance.py / find_cycles.py / generate_sdks.py / build_contrib.py / kebnf_grammar.lark）+ `Makefile` + `.github/workflows/` | 围绕"产物"的辅助胶水（自动化生成、自动化测试、上游同步、SDK 多 target 打包） | ★（视情况 vendor 一两个小工具）——本质上**是工程胶水，每家工程都有自己的写法** |
+
+也就是说：**真正"基础设施"属性的只有那 2 个 `.g4` 文件**；剩下的 4500+ 行 Python + Makefile + GH Actions 都是**作者本地工作流的产物，对其他人来说可有可无**。
+
+### 0.1 结论先行
+
+- 维护质量层面：daltskin 是**单人精良维护、工程级质量**的项目；**0 vibe-coding 信号**，**0 open issues**，10 周 36 commits 节奏稳定，已合入 `antlr/grammars-v4`，下游有 13+ 项目消费。
+- 复用策略层面：**只搬 2 个 `.g4` 文件 + 注明 MIT 出处即可**；按 §8.2.1 的 (C) 方案，半天就能把它接进自家工程，不依赖 daltskin 的 Python/Make 工具栈。
+- 工期与扩展层面：**不要等 daltskin 把领域扩展 merge 回 upstream**——领域 lint / KerML 单独 grammar / 私有 keyword 扩展多半不在 upstream scope 内。直接在自家 vendor 副本上 patch。
+- 真要重做的边界：**`.g4` 本身（特别是 56 处 ambiguity patch）才是难替代的部分**；其余全部可低成本自建。
+
+详见 §8 的四条接入路径横评与 §11 决策卡。
 
 ## 1 仓库基本面
 
@@ -301,46 +321,123 @@ Makefile 风格清爽（`.PHONY:` 全声明、`:= ?=` 区分严格、`@grep` 自
 
 ## 8 战略建议：fork 维护 vs vendor 文件 vs 自建
 
-### 8.1 三种路径横评
+### 8.0 把"复用程度"光谱拆清楚
 
-| 路径 | 上手时间 | 长期成本 | 与上游同步 | 推荐场景 |
+把 daltskin 划分成两层：
+
+- **生成产物层** = `grammar/SysMLv2{Lexer,Parser}.g4` + `PATCHES.md`（**只读**：是 KEBNF→ANTLR4 转换的最终结果，56 处 ambiguity 都修好了）
+- **生成器与工具链层** = `scripts/`（generate_grammar.py / conformance.py / find_cycles.py / generate_sdks.py / build_contrib.py / kebnf_grammar.lark）+ `Makefile` + `.github/workflows/`
+
+是否复用每一层是独立的两个选择，组合出 4 条路：
+
+| 路径 | 复用产物 (.g4) | 复用工具链 (scripts/) | 自己再做的活 |
+|---|---|---|---|
+| **(A) git submodule 整仓** | ✓ | ✓（拿来即用） | 0（除自家 listener/visitor/lint） |
+| **(B) fork 自维护** | ✓（在自家 fork 内可改） | ✓（可裁剪可改） | 维护 fork 与 upstream 同步 |
+| **(C) 只搬 `.g4` + 周围工具链全自建** | ✓（直接 copy 两个文件） | ✗（用自家 CI/build/test） | 写自己的 build/test/CI 套件 |
+| **(D) 全自起炉灶**（KEBNF→ANTLR4 也自己写） | ✗（自己跑 nomograph kebnf 或手写） | ✗ | 重做 56 处 ambiguity patch + KEBNF 解析 |
+
+四档之间的真实差额是「拿不拿 daltskin 工具链」与「自己有没有 KEBNF→ANTLR4 流水线」两个独立维度。
+
+### 8.1 四种路径横评
+
+| 路径 | 上手时间 | 长期维护成本 | 与 upstream 同步 | 推荐场景 |
 |---|---|---|---|---|
-| **(A) git submodule + commit lock** | **0.5 人日** | 低（每季度更新一次 commit hash 即可） | 自动获取 daltskin 后续 release，需要时再 bump | **工期紧、无领域扩展需求**、用法简单 |
-| **(B) fork 自维护 + 选择性 cherry-pick** | 1–2 人日 | 中（领域扩展可在自家 fork 演进；定期 rebase upstream） | 半自动；可选择性集成 daltskin 新 commit | **要做领域 lint / KerML 扩展、但希望保留与 upstream 接口** |
-| **(C) 直接 vendor `.g4` + 自建生成器** | 2–4 人日 | 高（要自己跟踪 OMG 上游 + 维护 PATCHES） | 完全脱钩，但承担全部维护责任 | **要做激进改造（如把 grammar 从 ANTLR4 转 tree-sitter）、且接受自维护成本** |
+| **(A) submodule 整仓** | **0.5 人日** | **极低**：每季度 `git submodule update` 一次 | 自动跟 daltskin 周期；新 OMG release 1–2 周内进得来 | 项目暂无领域扩展需求；想直接用 `make test` 套件 |
+| **(B) fork 自维护** | 1–2 人日 | 中：领域 patch 在自家 fork 做；定期 rebase upstream，可能有冲突 | 半自动；可选择性 cherry-pick daltskin commit | 要修 grammar 本体（加 `.kerml` 支持、加私有 keyword）、又希望保留与 upstream 的接口 |
+| **(C) 只搬 `.g4` + 工具链全自建**（**用户的"另起炉灶"**） | **1 人日**（vendor 文件 + 写自家解析 driver） | 中：`.g4` 跟 daltskin 节奏 bump；其它都自家 CI/工具栈 | **手动 bump**：监听 daltskin release / antlr/grammars-v4，按需复制 | **工期紧 + 自家工程已有完整 CI/build/test 栈，不愿引入 Python/lark/Make**；要对 grammar 做项目内私有 patch 但不想 upstream coordination |
+| **(D) 全自起炉灶**（不用 daltskin 任何文件） | 30–60 人日 | 高：要自己重做 56 处 ambiguity patch，跟踪 OMG 每个 release | 完全脱钩 | 仅当你要切到 tree-sitter / Langium / Roslyn 等非 ANTLR4 形式 |
 
-### 8.2 工期约束下的明确推荐
+### 8.2 工期约束下的具体推荐
 
-> 用户场景：**有工期约束，等不及把扩展 merge 回 daltskin 上游**。
+> 用户场景：**有工期约束，等不及把领域扩展 merge 回 daltskin 上游**。
 
-**推荐路径 = (A) 起步 + (B) 演进**：
+#### 8.2.1 默认推荐 = (C)
 
-1. **第 0 步**（5 分钟）：把 daltskin 当前最新 release tag `v2026.03.2`（commit `e5bfeda`）作为 git submodule 锁进自家工程：
+**只搬 `.g4` + 周围工具链全自建**——这正是用户在本节问题里给出的"另起炉灶"定义，对工期紧迫且已有 CI/build 栈的工程，**这是最优解**。
 
-   ```bash
-   git submodule add https://github.com/daltskin/sysml-v2-grammar.git \
-       third_party/sysml-v2-grammar
-   cd third_party/sysml-v2-grammar && git checkout v2026.03.2
-   cd ../.. && git add third_party/.gitmodules third_party/sysml-v2-grammar
-   git commit -m "vendor daltskin grammar v2026.03.2"
-   ```
+**第 0 步**（10 分钟）—— 把两个 `.g4` 文件直接 copy 到自家 repo：
 
-2. **第 1–N 步**：在自家工程内：
+```bash
+# Option C1: git subtree（保留来源 commit；以后想改 g4 直接改）
+git subtree add --prefix=third_party/sysml-grammar \
+    https://github.com/daltskin/sysml-v2-grammar.git \
+    v2026.03.2 --squash
 
-   - 写自家的 listener / visitor / lint rules，**不修改 submodule 内容**。
-   - 若需要 patch grammar 本身（如加 `.kerml` 支持），就**升级到 (B)**：fork daltskin 仓库，在 fork 内做改动，把 submodule 切到自家 fork。
+# Option C2: 直接 copy 文件（最轻量；接受失去 git 来源信息）
+mkdir -p third_party/sysml-grammar/grammar
+curl -fsSL -o third_party/sysml-grammar/grammar/SysMLv2Lexer.g4 \
+    https://raw.githubusercontent.com/daltskin/sysml-v2-grammar/v2026.03.2/grammar/SysMLv2Lexer.g4
+curl -fsSL -o third_party/sysml-grammar/grammar/SysMLv2Parser.g4 \
+    https://raw.githubusercontent.com/daltskin/sysml-v2-grammar/v2026.03.2/grammar/SysMLv2Parser.g4
+# MIT 要求保留版权声明：
+curl -fsSL -o third_party/sysml-grammar/LICENSE \
+    https://raw.githubusercontent.com/daltskin/sysml-v2-grammar/v2026.03.2/LICENSE
+echo "v2026.03.2  $(date -I)" > third_party/sysml-grammar/VERSION
+```
 
-3. **不寄望短期 merge upstream**：daltskin 单人维护 + PR 评审 ≤ 1 天，**理论上**很快——但「领域 lint 规则、KerML 单独 grammar、私有扩展语法」这类**不属于 upstream scope** 的内容，作者不一定接受。我们的工期假定不能等。
+**第 1 步**（剩余几小时到 1 天）—— 在自家 repo 用自家 build 栈生成 parser：
 
-### 8.3 不要 (C) 自起炉灶的理由
+```yaml
+# 例：自家 Maven 工程
+<plugin>
+  <groupId>org.antlr</groupId>
+  <artifactId>antlr4-maven-plugin</artifactId>
+  <version>4.13.2</version>
+  <configuration>
+    <sourceDirectory>${project.basedir}/third_party/sysml-grammar/grammar</sourceDirectory>
+    <outputDirectory>${project.build.directory}/generated-sources/antlr4</outputDirectory>
+  </configuration>
+  <executions><execution><goals><goal>antlr4</goal></goals></execution></executions>
+</plugin>
+```
 
-如果你想完全 fork 文法、不用 daltskin 工具链、纯靠 nomograph kebnf 自生成或手写：
+或：
 
-- **机会成本**：你需要重做 daltskin 已经做完的 56 处 ambiguity patch（PATCHES.md），每次 OMG 上游变化都要重新做。粗估**每个上游 release 1–3 人天**。
-- **conformance 重做**：你要自己写一致性测试 harness，daltskin 已经有 327 行成熟代码。**至少 2 人天**复刻。
-- **bus factor 上转嫁给自己**：daltskin 出问题（如 maintainer 长期不在）时，你 fork 后自维护是自然过渡；但**从一开始**就脱钩，等于把"跟踪 OMG 上游"这件事完全接到自家盘上。
+```bash
+# 例：自家 Python 项目，CI 里跑
+java -jar antlr-4.13.2.jar -Dlanguage=Python3 \
+    third_party/sysml-grammar/grammar/*.g4
+```
 
-**唯一选 (C) 的场景**：你需要把 grammar 从 ANTLR4 切到 tree-sitter / Langium / Roslyn 等其它形式，那时 daltskin 工具链对你不再适用。但如果你坚持 ANTLR4，**(C) 是不必要的工程负债**。
+整个流程不带任何 daltskin Python / Make / lark 依赖。
+
+**第 2 步以后** —— 自家做这些（每件都比啃 daltskin 工具链便宜）：
+
+| 自家要做的事 | 工期 | 替代 daltskin 哪个 |
+|---|---|---|
+| Conformance 测试（在 ANTLR TestRig 或自家 driver 上跑 OMG 训练库 + Pilot stdlib + 真实世界 corpus） | **0.5 人日** | conformance.py（327 行） |
+| Listener / Visitor 骨架 → 自家 IR / JSON | 2–3 人日 | 不在 daltskin scope |
+| 领域 lint 规则（基于 [04 §3.6.8 失败模式](04-parsing-ide-infrastructure.md#368-失败案例根因分析11--350-真-v2-子集) 的 30 条） | 5–10 人日 | 不在 daltskin scope |
+| 上游 OMG release 监听（季度手动 bump 即可） | **0** | watch-upstream.yml（160 行） |
+| ANTLR 文法 cycle / 死规则检查 | 0.3 人日（搬 daltskin 那两个 < 80 行的小工具更快） | find_cycles.py + find_dead_rules.py |
+
+加总：**核心搭建 1 人日，全栈跑通含 lint 5–10 人日**，全部在自家 build 栈内完成；不接受任何 daltskin Python 依赖。
+
+#### 8.2.2 何时选 (A) 而非 (C)
+
+- 你想**直接复用 daltskin 的 conformance.py / find_cycles.py 等**——不想自家再写
+- 你的工程是 Python 栈本来就装 lark + ruff——再多 daltskin 几个脚本无所谓
+- 你想得到 `make update-conformance / make lint / make sdk-archive` 这一套现成命令
+
+(A) 的「拿来即用」体验最好，但代价是把 daltskin 的 Python 工具栈（lark + requests + ruff + actionlint + pip-audit）也捆进自家工程依赖。**对非 Python 项目尤其不划算**。
+
+#### 8.2.3 何时选 (B) 而非 (C)
+
+- 你需要在 grammar 本体上做**多人协作的修改**，且这些改动你希望最终能回流上游
+- 你团队有专人愿意维护 fork 并定期 rebase
+
+如果你的目的只是「项目内私有改 grammar」、不打算回流，**(B) 反而比 (C) 多绑了一份 fork 维护成本**——直接 (C) 更轻。
+
+#### 8.2.4 (D) 自起炉灶的硬阻碍
+
+仅在「要切换 grammar 形式（tree-sitter / Langium / Roslyn）」时才考虑。否则你需要：
+
+- 重做 56 处 KEBNF→ANTLR4 ambiguity patch（PATCHES.md 详列），**每个 OMG release 1–3 人天**。
+- 重做 KEBNF 解析（`generate_grammar.py` 3309 行 transpiler），如果不直接搬 [`nomograph-ai/kebnf`][^repo-nomograph-kebnf-2] 的话。
+- 自己实现一致性测试 harness（**≥ 2 人天**复刻 daltskin 已有的 327 行）。
+
+> 关键直觉：**daltskin 真正难替代的只有"56 处 ambiguity patch"这件事**。`.g4` 文件已经是这件事的成品。所以 **拿 .g4 = 拿到了 daltskin 99% 的技术价值**；剩下的工具链全是工程胶水，每家工程的胶水偏好都不一样，没必要复用。
 
 ### 8.4 风险点与对冲
 
@@ -380,14 +477,18 @@ Makefile 风格清爽（`.PHONY:` 全声明、`:= ?=` 区分严格、`@grep` 自
 
 | 维度 | 评估 |
 |---|---|
-| **是否值得作为基础设施依赖？** | **是**——9–13 个下游项目验证、antlr/grammars-v4 接收、`make test` 实测通过 |
+| **daltskin 是不是基础设施？** | **不是仓库级基础设施**——基础设施属性集中在 2 个 `.g4` 文件 + 56 处 ambiguity patch；其余 4500+ 行 Python/Make/CI 都是作者本地工作流的工程胶水 |
+| **2 个 `.g4` 文件值不值得依赖？** | **值**——antlr/grammars-v4 已收编，13+ 下游项目验证，96.9% 真 v2 corpus 通过率（[04 §3.6.6](04-parsing-ide-infrastructure.md#366-端到端-conformance-数据官方--15-个真实世界仓共-252--362--614-文件)） |
 | **是不是 vibe-coding？** | **不是**。12 项 vibe 信号检测全部为"非 vibe"——纪律性强、CI 严谨、依赖审计、SHA pin、无 stale issue |
-| **维护风险（bus factor）** | **中**。单人主维（Microsoft 员工业余项目）+ 1 社群贡献 + bot 自动化。已合入 antlr/grammars-v4 给了故障转移路径。 |
-| **能力边界** | `.sysml` 在 Java/Python/JS 三 runtime 上 96.9% 真 v2 通过率（详 [04 §3.6.6](04-parsing-ide-infrastructure.md#366-端到端-conformance-数据官方--15-个真实世界仓共-252--362--614-文件)）；不支持 `.kerml`（需另外接 sireum / Pilot Xtext / 自跑 nomograph kebnf）|
-| **License** | MIT，无 GPL 风险，可商用、可 fork、可重发 |
-| **接入路径** | `git submodule` 锁 `v2026.03.2`（commit `e5bfeda`），按 [04 §3.7 推荐复用清单](04-parsing-ide-infrastructure.md#37-推荐复用清单) 嵌入 |
-| **不要做的事** | 别等 upstream merge 自家领域扩展（lint / KerML 等），不在他们 scope 内 |
-| **必须自建的** | 领域 lint 规则集；KerML grammar（如果需要）；listener/visitor 中间表示 |
+| **维护风险（bus factor）** | **中**。单人主维（Microsoft 员工业余项目）+ 1 社群贡献 + bot 自动化。已合入 antlr/grammars-v4 给了故障转移路径 |
+| **能力边界** | `.sysml` 在 Java/Python/JS 三 runtime 上 96.9% 真 v2 通过率；不支持 `.kerml`（需另外接 sireum / Pilot Xtext / 自跑 nomograph kebnf） |
+| **License** | MIT，无 GPL 风险，可商用、可 fork、可重发；只需保留 LICENSE + 版权声明 |
+| **推荐接入路径** | **(C) 只搬 `.g4` + 周围工具链全自建**（§8.2.1）——半天接入；自家工程 build/CI/test 栈不引入 daltskin 的 Python 依赖；领域 patch 直接在自家 vendor 副本上做 |
+| **真正不可替代的部分** | **PATCHES.md 列出的 56 处 KEBNF→ANTLR4 ambiguity patch**——这是 daltskin 已经做完、别处暂无的劳动成果，每个 OMG release 还需要 1–3 人天维护 |
+| **可选 vendor 的小工具** | `find_cycles.py`（74 行）+ `find_dead_rules.py`（64 行）合计 ≤ 150 行——自家也好用 |
+| **完全不必复用的** | `generate_grammar.py` / `Makefile` / `.github/workflows/*.yml` / `scripts/conformance.py` / `scripts/generate_sdks.py` / `scripts/build_contrib.py`——每家工程会有更顺手的自家版本 |
+| **不要做的事** | (1) 别等 upstream merge 自家领域扩展；(2) 别为了"全自起炉灶"重做 56 处 ambiguity patch（除非切换到非 ANTLR4 形式） |
+| **必须自建的** | 领域 lint 规则集；KerML grammar（若需要）；listener/visitor 中间表示；自家的 conformance 测试套件（30 行 ANTLR TestRig 包装即可） |
 
 ## 参考文献
 
@@ -404,3 +505,5 @@ Makefile 风格清爽（`.PHONY:` 全声明、`:= ?=` 区分严格、`@grep` 自
 [^repo-daltskin-vscode]: *daltskin/VSCode_SysML_Extension*. <https://github.com/daltskin/VSCode_SysML_Extension>
 
 [^repo-hamr-2]: *sireum/hamr-sysml-parser*. <https://github.com/sireum/hamr-sysml-parser>
+
+[^repo-nomograph-kebnf-2]: *nomograph-ai/kebnf*. <https://github.com/nomograph-ai/kebnf>
