@@ -13,16 +13,18 @@ README.md                                # TLDR + 核心矩阵 + docs/ 索引
 AGENTS.md                                # 本文件（CLAUDE.md 是 symlink）
 CLAUDE.md -> AGENTS.md
 docs/
-├── 00-overview.md                       # 总览 / 调研方法
-├── 01-standard-status.md                # OMG 标准 / KerML 分层 / API 规范
-├── 02-academic-landscape.md             # 论文 / 团队 / 案例
+├── 00-overview.md                       # 总览 / 调研方法 / 12 章导航 / 阅读路径
+├── 01-standard-status.md                # OMG 4 份规范深读 / KerML 分层 / API / KEBNF / v1↔v2 转换实测
+├── 02-academic-landscape.md             # 学术文献引导页（9 维主题分类）
 ├── 03-beihang-investigation.md          # 北航专项
-├── 04-parsing-ide-infrastructure.md     # 解析 / LSP / IDE
-├── 05-formal-verification.md            # 形式化 / 验证
+├── 04-parsing-ide-infrastructure.md     # 9 套 parser / 解析 / LSP / IDE / KPAR / sysand
+├── 05-formal-verification.md            # 形式化 / 验证（11 路径）
 ├── 06-visualization-collaboration.md    # 可视化 / 协作 / 版本控制
-├── 07-codegen-execution.md              # 代码生成 / 执行 / 仿真
-├── 08-baseline-comparison.md            # UML / v1 / AADL / Modelica / Capella / BPMN / TLA+ / Alloy
+├── 07-codegen-execution.md              # 代码生成 / 执行 / 仿真 / CI
+├── 08-baseline-comparison.md            # 8 语言对照（UML / v1 / AADL / Modelica / Capella / BPMN / TLA+ / Alloy）
 ├── 09-gaps-opportunities.md             # 缺口与机会窗口
+├── 10-daltskin-deep-audit.md            # daltskin/sysml-v2-grammar 全仓审计 + 接入策略
+├── 11-real-world-corpora.md             # 40 公开仓 × 3255 .sysml 实测语料调研
 └── references.md                        # 集中参考文献（聚合索引）
 ```
 
