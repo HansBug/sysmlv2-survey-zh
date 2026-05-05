@@ -46,6 +46,7 @@ OMG SysML v2 自 2017 年立项[^seidewitz-2017]、2023 年起进入 Beta 公开
 | 09 | [缺口与机会](09-gaps-opportunities.md) | 短期（1–3 月）/ 中期（3–12 月）/ 长期（1–3 年）机会窗口；按维度归类的开源空白 | 立项、研究方向选择 |
 | 10 | [daltskin 深度审计](10-daltskin-deep-audit.md) | daltskin/sysml-v2-grammar 全仓 36 commits + 11 模块逐一摸过 + 跑通；vibe-coding 12 信号检测全过；上下游依赖图；接入策略 (A/B/C/D) 推荐 (C) git submodule 工具链全自建 | ANTLR 工具链负责人、立项 |
 | 11 | [真实世界 v2 代码语料](11-real-world-corpora.md) | 40 公开仓 × 3255 .sysml 实测；daltskin 通过率 94.7%；工具签名分布；OTHER 类失败 Beta1/2 已弃语法清单；6 个旗舰语料 + 5 stress-test + 3 应剔除 | LLM 微调/评测、conformance baseline 选定 |
+| 12 | [ModelCopilot / WSE-Lab 深度档案](12-modelcopilot-deep.md) | 北航 WSE-Lab + ModelCopilot 平台全景；8 仓库逐项深读（PSUM-SysMLv2 7 案例、LLM4MDE 254 篇 SLR、IsingBench 4 求解器+3 经典 SE 数据集等）；arXiv 2602.21641 PSUM 解剖；公众号现状；与 OMG/华望/Cameo/Loughborough 战略对位；6 月/1 年/3 年走向预测 | 跟踪国内 SysML v2 学术节点；与 BUAA 合作前必读 |
 | ★ | [参考文献](references.md) | 全部 cite key 集中索引（标准 / 论文 / OSS / 商用 / 教程 / Baseline） | 找原文出处 |
 
 ## 4 生态分层

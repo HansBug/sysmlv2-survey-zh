@@ -109,107 +109,45 @@
 
 北航航空学院 + 中国空间技术研究院（航天五院）合作发表《**基于模型的载人航天器研制方法研究与实践**》[^zhang-2020-aircraft]——张柏楠（通讯）、**戚发轫（中国工程院院士）**、邢涛、刘洋、王为，航空学报 2020 41(7) 023967。
 
-### 2.7 WSE Laboratory + ModelCopilot 平台深读
+### 2.7 WSE Laboratory + ModelCopilot 平台
 
-> **关键事实**：岳涛 + 张曼在北航的研究组运营一个独立对外品牌 **WSE-Lab（Software Engineering Elevated Laboratory）**，但**北航学院主页未列出该实验室**——它通过自有官网 + GitHub 组织 + 微信公众号三位一体存在。这是这次第三轮调研最重要的新发现，**是中国 SysML v2 / KerML 生态最活跃的高校学术节点**。
-
-#### 2.7.1 实验室基本面
+> **本节是导航摘要。完整深读已独立成 [12-modelcopilot-deep.md](12-modelcopilot-deep.md) ——含 8 仓库逐项分析、核心论文 arXiv 2602.21641 解剖、PSUM stereotype 完整集、平台技术规格、公众号现状、6 月/1 年/3 年前瞻轨迹预测。**
 
 | 维度 | 信息 |
 |---|---|
-| 名称 | **WSE Laboratory（WSELab）** = Software Engineering Elevated Laboratory |
-| 官网 | <https://www.modelcopilot.org/>（域名 `wse-lab.github.io` 已 301 重定向至此）[^modelcopilot] |
-| GitHub 组织 | <https://github.com/WSE-Lab>，创建于 2024-09-04，**8 个公开仓库**[^wse-lab-gh] |
-| 微信公众号 | **ModelCopilot**（搜狗微信确认 ≥1 篇推文，未做企业认证；`gh_xxx` ID 需扫描 modelcopilot.org 首页二维码获取） |
-| 地址 | 北京市海淀区学院路 37 号（北航学院路校区） |
-| 联系邮箱 | yuetao@buaa.edu.cn / manzhang@buaa.edu.cn |
-| 团队规模 | **17 人**（教授 1 + 副教授 1 + PhD 2 + MEng 11 + BEng 3 + 访问学者 1） |
+| 名称 | **WSE Laboratory**（Software Engineering Elevated Laboratory）[^modelcopilot] |
+| 官网 | <https://www.modelcopilot.org/>（`wse-lab.github.io` 重定向至此） |
+| GitHub 组织 | <https://github.com/WSE-Lab>，2024-09-04 创建，**8 个公开仓库**[^wse-lab-gh] |
+| 微信公众号 | **ModelCopilot**（在搜狗 / Bing 公网索引中均**无可见文章**——未认证私号或试运行号；二维码在官网 footer） |
+| 地址 / 邮箱 | 北京市海淀区学院路 37 号 / yuetao@buaa.edu.cn · manzhang@buaa.edu.cn |
+| 团队规模 | **19 人**（教授 1 + 副教授 1 + PhD 2 + MEng 11 + BEng 3 + 访问 1） |
+| 三大研究项目 | **ModelCopilot 平台**（KerML 95.6% + SysML v2 87.9% 自报）/ **LiveTCM** ADS 测试 / **IsingBench** 量子优化测试 |
+| 自报五大方向 | Uncertainty-aware SE、Quantum SE、Model-based SE、Intelligent Software Testing、Optimization in SE |
+| 团队 PI | 岳涛（教授）+ 张曼（副教授，与岳涛 22 篇合作；EvoMaster 重要作者）[^manzhang-dblp] |
 
-#### 2.7.2 团队成员
+#### 2.7.1 8 仓库导航表（"太长不看"，详见 [12-modelcopilot-deep.md §4](12-modelcopilot-deep.md#4-github-8-仓库逐项深读)）
 
-| 角色 | 姓名 | 在 WSE-Lab 中的分工 |
-|---|---|---|
-| 教授（PI） | **岳涛 Tao Yue** | PSUM / SysML v2 / OMG 标准侧；详细画像见 §3.2 |
-| 副教授 | **张曼 Man Zhang** | AI-based 软件测试主线；EvoMaster 重要作者；REST API fuzzing 与 AV 测试[^manzhang-dblp] |
-| PhD | **Yunyang Li** | ModelCopilot 后端：语法解析、语义校验 |
-| PhD | **Haoyang Li** | ModelCopilot 后端：可解释 AI、模型校验 |
-| MEng（11 人） | Zhetao Sun, Xijun Liu（解析） · Pengcheng Hao, Yuhan Yang（可视化） · Peiru Li, Jiarong Dong（UI） · Hongjie Xie, Fengxu Gu, Jiayi Yan, Chongyang Shen, Haoyan Wang | 工程实现 |
-| BEng（3 人） | Yige Yang（解析） · Mengkun Liu · Run Yuan | 实习开发 |
-| 访问 | Beñat Iruretagoyena Andres | 承接岳涛之前 Simula 网络的欧洲方向 |
+| 仓库 | 类型 | License | 核心数据 | 是否值得跳转 |
+|---|---|---|---|---|
+| [PSUM-SysMLv2](https://github.com/WSE-Lab/PSUM-SysMLv2) | OMG PSUM × SysML v2 profile + **7 案例**（ACC/AF/DS/IS/MF/VFEA/VM） | GPL-3.0 | 全球首个 PSUM-SysMLv2 落地；arXiv 2602.21641 配套 | **核心**：SysML v2 不确定性方向必看 |
+| [LLM4MDE](https://github.com/WSE-Lab/LLM4MDE) | SLR 综述 | GPL-3.0 | **254 篇 / 2066 初筛**（CSV 实测；README 写 228）；2024×84+2025×113 主力 | **太长不看**：核心数据见左列 |
+| [QuantumOpt4SE](https://github.com/WSE-Lab/QuantumOpt4SE) | SLR 综述 + arXiv 2506.16878 | LGPL-3.0 | **76 篇 / 2083 初筛**；含 BUAA 蔡开元为合作者 | **太长不看**：核心数据见左列 |
+| [QuantumOpt4SE-EmpiricalStudies](https://github.com/WSE-Lab/QuantumOpt4SE-EmpiricalStudies) | 实证元分析 + arXiv 2510.27113 | GPL-3.0 | **78 行 × 25 列**实证维度 | 仅当 reporting guideline 研究 |
+| [IsingBench](https://github.com/WSE-Lab/IsingBench) | Python CLI 工具 | LGPL-3.0 | TCS/TCM 测试问题 → Ising Hamiltonian；4 求解器（CIM/BF/GA/SA）+ 3 经典数据集（paintcontrol 90 / gsdtsr 5555 / iofrol 1941） | **核心**：量子启发优化必看 |
+| [liveTCM-demo](https://github.com/WSE-Lab/liveTCM-demo) | NL + 模型驱动 ADS 测试 demo | None | **4★（最热仓）**；CARLA 0.9.15 + Vue 前端 + DeepCollision MORL；8 大功能 | **核心**：自动驾驶测试方向必看 |
+| [LiveTCM](https://github.com/WSE-Lab/LiveTCM) | 实验日志档案（**非空仓**） | None | **165+ LLM 实验日志**沉淀（每个 30–175 KB） | 仅当复现实验数据 |
+| [WSE-Lab.github.io](https://github.com/WSE-Lab/WSE-Lab.github.io) | 官网源码 | None | index/model-copilot/QSE/ADS 4 页 | 跳过 |
+| ~~WSE-ModelCopilot~~ | **HTTP 404 不存在** | — | 网站 footer 占位"open source in progress" | 等 2026 H2 |
 
-#### 2.7.3 主推研究项目（3 条主线）
+#### 2.7.2 ModelCopilot ≠ "MBSE Co-Pilot"（澄清）
 
-按 modelcopilot.org 自述：
+英文搜索 "MBSE Co-Pilot" 命中的 *MBSE Co-Pilot: A Research Roadmap*（Loughborough Wenheng Zhang 等，INCOSE *Systems Engineering* 2026, DOI 10.1002/sys.70011[^mbse-copilot-loughborough]）**与北航 WSE-Lab 的 ModelCopilot 完全无关**——是同名同题但不同团队、不同性质的两条独立研究线。详见 [12 §6.2](12-modelcopilot-deep.md#62-同名误识澄清重要)。
 
-1. **ModelCopilot 平台**：把 SysML v2 / KerML 模型变成"动态、上下文感知的协作者（dynamic, context-aware collaborators）"。已实现 **KerML 95.6%（239/250 元素）+ SysML v2 87.9%（452/514 元素）**；在线 demo `http://116.204.36.247`（国内 IDC IP，访问偶发不稳）。开源代码托管位 <https://github.com/WSE-Lab/WSE-ModelCopilot> 当前 **404 / "open source in progress"**。
-2. **ADS（Autonomous Driving Systems）**：动态测试用例生成与执行；与 LiveTCM 仓库对应。
-3. **Uncertainty-wise methodologies for CPS**：CPS 系统的不确定性理解与测试；与 PSUM-SysMLv2 仓库对应。
+#### 2.7.3 三问速答（详见 [12-modelcopilot-deep.md §1](12-modelcopilot-deep.md#1-决策卡直面三个核心问题)）
 
-#### 2.7.4 GitHub 8 仓库逐一定位（"太长不看"导航表）
-
-下表帮你快速判断每个仓库要不要点进去看。每行附**核心数据**（论文数 / 元素数 / 数据集大小）+ **跳转指引**。
-
-| # | 仓库 | 类型 | License | 体量 | 最近 push | 核心产物 | 是否值得跳转 |
-|---|---|---|---|---|---|---|---|
-| 1 | [WSE-Lab/WSE-Lab.github.io][^wse-gh-site] | 官网源码 | None | HTML | 2026-03-19 | 实验室主页静态源（部署到 modelcopilot.org） | 仅运维 / 无内容价值 |
-| 2 | [WSE-Lab/LiveTCM][^wse-gh-livetcm] | 工具占位 | None | 空 | 2025-03-25 | LiveTCM 主仓库占位（实际 demo 在 #3） | **跳过**，看 #3 |
-| 3 | [WSE-Lab/liveTCM-demo][^wse-gh-livetcm-demo] | Python + CARLA demo | None | Python | 2025-06-19，**4★** | **基于 NLP + 模型驱动的 ADS 测试规约平台** demo；7 个核心能力（树形浏览器、NL 转模型、API 自动补全、多种 oracle、场景录制、执行控制）；依赖 CARLA 0.9.15 + Chrome；MoDELS 2021 论文配套[^shi-2021-models] | **核心**：自动驾驶测试方向必看 |
-| 4 | [WSE-Lab/QuantumOpt4SE][^wse-gh-qopt-survey] | 系统综述（SLR） | LGPL-3.0 | CSV 数据 | 2026-04-12 | **76 篇精选 / 2083 初筛** "量子优化在软件工程中的应用"系统综述；含 `initial_searching.csv` + `final_selection.csv`；论文 *Quantum Optimization for Software Engineering: A Survey* 同名 | **太长不看**：核心数据见左列 76/2083 |
-| 5 | [WSE-Lab/QuantumOpt4SE-EmpiricalStudies][^wse-gh-qopt-empirical] | 实证研究数据 | GPL-3.0 | CSV | 2025-10-29 | 量子优化 SE 实证研究提取数据（`extracted_data.csv`）；与 #4 配套 | 仅当深做 QSE 实证研究 |
-| 6 | [WSE-Lab/PSUM-SysMLv2][^wse-gh-psum] | Profile + 案例 | GPL-3.0 | 385 KB，**1★** | 2026-02-27 | **PSUM-SysML v2 框架配套**：MOF XMI 抽象语法定义（`profile/`）+ 7 个 case study 原始实验结果（`case-studies/`）；引用 SysML-v2-Pilot-Implementation 作部分基础；arXiv 2602.21641 论文配套[^zhang-2026-uncertainty] | **核心**：SysML v2 不确定性建模研究必看 |
-| 7 | [WSE-Lab/IsingBench][^wse-gh-isingbench] | Python CLI 工具 | LGPL-3.0 | Python | 2026-04-13 | **测试优化 + Ising 模型** 端到端流水线：解 Test Case Selection / Test Case Minimization 两类问题；内置 3 套 benchmark 数据集（paintcontrol、gsdtsr、iof/rol）；4 种求解器（CIM / BruteForce / GA / SA）；Python 3.11+ + PyTorch + 可选 CUDA；可与文献中 QAOA 对比 | **核心**：量子启发优化 + 测试方向必看 |
-| 8 | [WSE-Lab/LLM4MDE][^wse-gh-llm4mde] | 系统综述（SLR） | GPL-3.0 | CSV | 2026-04-01 | **228 篇精选 / 2066 初筛** "LLM 在 MDE（模型驱动工程）中应用"系统综述；含 `initial_search.csv` + `final_selection.csv`；与 LLM × SysML / 形式化工程方向高度相关 | **太长不看**：核心数据见左列 228/2066 |
-
-#### 2.7.5 仓库分类与跳转优先级
-
-按方向选择性深读：
-
-**做 SysML v2 / KerML 工具或不确定性研究的人**：
-
-- 必看 #6 PSUM-SysMLv2（profile + 7 case studies + 与 OMG SysML-v2-Pilot-Implementation 集成）
-- 关注 ModelCopilot 主仓 [WSE-Lab/WSE-ModelCopilot][^wse-gh-modelcopilot] 何时开源（"in progress"）；可对该仓库设 `Watch`
-
-**做 LLM × MBSE / 形式化工程的人**：
-
-- 必看 #8 LLM4MDE（**228 篇 SLR 直接拿来当 Related Work 引文池**）
-- 不必读全文：核心数字 228/2066，覆盖年份按 CSV 内 `year` 字段过滤即可
-
-**做量子软件工程的人**：
-
-- 必看 #4 QuantumOpt4SE 综述（76 篇）+ #5 实证数据 + #7 IsingBench 工具栈
-- 三者互补：综述是文献地图，实证是数据，IsingBench 是可跑的端到端工具
-
-**做自动驾驶 / CPS 测试的人**：
-
-- 必看 #3 liveTCM-demo（NL → 测试规约的端到端 demo，含 CARLA 集成）
-- 留意 ModelCopilot 主仓后续开源——届时与 LiveTCM 形成"模型 + 测试"完整链
-
-**仅作生态了解的人**：
-
-- 跳过 #1 #2，浏览 #6 #8 README 即可了解 WSE-Lab 的研究内涵
-- 阅读 modelcopilot.org 首页 + 「ModelCopilot」公众号推文（搜狗微信搜"ModelCopilot 岳涛"）
-
-#### 2.7.6 与岳涛公开论文的对应关系
-
-WSE-Lab 8 仓库的研究方向与岳涛公开的研究主线**一一对应**：
-
-| 仓库 | 对应岳涛研究主线 | 代表论文 |
-|---|---|---|
-| ModelCopilot 平台（核心） | Model-based SE / MBE | arXiv 2602.21641（PSUM）；多篇 SoSyM / TOSEM CPS 数字孪生论文 |
-| PSUM-SysMLv2 | OMG PSUM 标准（co-chair） + Uncertainty-wise SE | arXiv 2602.21641 ; OMG PSUM 1.0 (2025-06 通过)[^omg-psum] |
-| LLM4MDE | LLM × MBE 综述 | 与 BERT 测试架构生成（ICECCS 2024）+ Reality Bites（FORGE 2024）+ NL-guided AV testing（Internetware 2025）一致 |
-| QuantumOpt4SE 系列 | 量子软件工程（QSE）—— 占她 2020+ 论文 30% 比例 | TOSEM 量子专栏 GuestEiC ; QSE Roadmap (TOSEM 2025) ; QuSBT/Quito/QuCAT/Muskit 等 8+ 工具论文 |
-| IsingBench | 量子优化 + 测试 | Test Case Minimization with Quantum Annealers (TOSEM 2025) ; QAOA for Test (TSE 2024) |
-| liveTCM-demo | 自动驾驶 / 智能软件测试 | DeepScenario, EpiTESTER, Pretrain-Prompt-Transfer, KDDT 等 20+ 论文 |
-
-#### 2.7.7 ModelCopilot ≠ "MBSE Co-Pilot"（澄清）
-
-**重要澄清**：检索 "MBSE Co-Pilot" 命中的另一项研究 *MBSE Co-Pilot: A Research Roadmap*（Wenheng Zhang 等，**Loughborough University**，Systems Engineering 2026[^mbse-copilot-loughborough]）**与 WSE-Lab 的 ModelCopilot 无关**——是英国 Loughborough 的独立研究路线图论文。两者重名巧合：
-
-- **ModelCopilot**（一个词 / 大写）= 北航 WSE-Lab 团队平台 + 公众号
-- **"MBSE Co-Pilot"**（连字符）= Loughborough 大学 Wenheng Zhang 等的 AI × MBSE 研究路线图，是论文而非工具
-
-这次调研已确认两者不存在引用 / 合作关系。
+- **Q1 进度**：中后期 alpha 实验室原型 + 单点突破已发表论文 / 已开源实证 artifact，但 ModelCopilot 平台代码至今未公开；公众号几无对外可检索内容。
+- **Q2 定位**：OMG SysML v2 / PSUM 标准的**BUAA 学术参考实现** + AI4MBSE 元平台；不与 Cameo / 华望工具链正面碰撞。
+- **Q3 后续**：2026 H2 平台开源 + PSUM 集成版 + 4 篇配套论文密集投稿；2027 启用公众号 + 国内顶刊综述；2027–2029 收敛 PSUM × Quantum-SE × LLM4MDE 三线为 "AI4MBSE" 统一议程。
 
 ## 3 北航团队 SysML / MBSE 论文清单（2018–2026）
 

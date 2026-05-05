@@ -25,6 +25,7 @@ docs/
 ├── 09-gaps-opportunities.md             # 缺口与机会窗口
 ├── 10-daltskin-deep-audit.md            # daltskin/sysml-v2-grammar 全仓审计 + 接入策略
 ├── 11-real-world-corpora.md             # 40 公开仓 × 3255 .sysml 实测语料调研
+├── 12-modelcopilot-deep.md              # 北航 WSE-Lab + ModelCopilot 全景档案
 └── references.md                        # 集中参考文献（聚合索引）
 ```
 
