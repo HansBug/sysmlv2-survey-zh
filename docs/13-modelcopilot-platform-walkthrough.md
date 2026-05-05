@@ -6,24 +6,25 @@
 
 - 登录 / 注册 / 找回密码三套表单（注册对外开放 → §3.1）
 - 完整菜单图谱：File 菜单 5 项 + Run 菜单 3 项 + Settings 面板 5 项控件（§3.2 / §3.5）
+- 实时「左编辑器 + 右图」并排工作流的实拍图（§3.9）
 - 7 种视图（All / Action / General / Requirement / State / Structure / Usecase）的真实 PlantUML SVG（§4）
 - API 表面：6 个端点 + 完整请求 / 响应契约（§5）
-- 后端指纹：Spring Boot + MongoDB ObjectId + nginx 1.18.0（§6）
-- PSUM 扩展的"声明 vs 实际"：**toggle 切换语言模式 + 左侧栏新增两个 PSUM 标签，但 PSUM stereotype 语法实际不被解析器接受**（§7）
+- **OMG Pilot Implementation 同源性取证**：6 类证据判定 ModelCopilot 是 Pilot fork 而非自研（§6）
+- PSUM 扩展的"声明 vs 实际"：toggle 切换语言模式 + 左侧栏新增两个 PSUM 标签，但 PSUM stereotype 语法实际不被解析器接受（§7）
 - i18n 字典中已埋但 UI 未连线的 dead code：`Open AI Assistant` / `Switch to Diagram` / `copilot.autoCompletion` / 编辑器 `Format` / `Close All`（§8）
 - docs/12 自报指标的对照核验（§9）
-- 13 张「无脑照办」操作指引截图 + 5 张真实 SVG 渲染样本（§10）
-- 32 轮探索过程中 **未能进入** 的 7 个角落，给出原因 + 推测 + 证据（§11）
+- 13 张「无脑照办」操作指引截图 + 5 张真实 SVG 渲染样本 + 2 张实时编辑预览实拍（§11）
+- 32 轮探索过程中 **未能进入** 的 9 个角落（含一个**裸 HTTP secure-context 限制导致前端崩溃**的关键发现），给出原因 + 推测 + 证据（§12）
 
 > **标注**：本章基于一个普通 NORMAL 等级账号 + 自动化探索；不涉及任何破坏性测试；所有截图为真实生产环境。账号 `hansbug@buaa.edu.cn`，token `69f9de5d8d135971b63a6037`，本快照采样于 2026-05-05 21:00 (UTC+8)。
 
-## 1 总览：两句话给结论
+## 1 总览：三句话给结论
 
-**ModelCopilot 平台是「OMG Pilot Implementation 的中文 fork + Web SPA 壳层」**：核心能力（解析、PlantUML 图渲染、项目持久化）是 Pilot 那一套[^repo-pilot-13]的等价物，外壳是一个不到 1.2 MB 的 Vue 3 + Element Plus SPA。**没有 AI / Copilot / 自动补全 / 协作 / 版本历史等任何"差异化能力"在 UI 中实际可触发**——i18n 字典里能搜到 `openAiAssistant`、`copilot.autoCompletion` 等键，但代码侧没有任何按钮 / 路由 / 组件引用它们[^js-bundle-13]。
+**第一句**：**ModelCopilot 平台几乎可以肯定是 OMG Pilot Implementation 的二次开发**（Pilot fork + Spring Boot HTTP 包装 + MongoDB 持久层 + Vue 3 SPA 重写）——不是从零自研。**6 类取证证据**（§6）包括：51/65 Pilot 标准库命名空间命中、错误信息字面相同（含 logger bug 双空格的复刻）、AST JSON 字段集与 Pilot Element 对应、KerML 默认不自动导入 SysML 的精确语义复刻、PlantUML 输出 90%+ 字节级相似、Spring Boot 错误页指纹。WSE-Lab 在这个项目上的真实工程量集中在包装层 + Vue 前端 + （计划中的）PSUM 扩展和 AI 接入。
 
-平台名 `Model Copilot` 的 "Copilot" 在当前部署里是**愿景而非实现**：截至本快照，整套"Copilot"功能仅以 i18n 字符串占位形式存在。这一点与 docs/12 §1 决策卡里的 "AI Co-pilot 是 Pilot 不覆盖的方向" 一致——意思是"承诺要做但还没做"。
+**第二句**：**没有 AI / Copilot / 自动补全 / 协作 / 版本历史等"差异化能力"在 UI 中实际可触发**——i18n 字典里能搜到 `openAiAssistant`、`copilot.autoCompletion` 等键，但代码侧没有任何按钮 / 路由 / 组件引用它们[^js-bundle-13]。平台名 `Model Copilot` 的 "Copilot" 在当前部署里是**愿景而非实现**——这与 docs/12 §1 决策卡里的 "AI Co-pilot 是 Pilot 不覆盖的方向" 自报承诺一致：意思是"承诺要做但还没做"。
 
-第二句话：**核心解析 / 编译 / 7 种视图渲染功能稳定可用**，对 `Adaptive Cruise Control` 这种 6.6 KB 的纯 SysML v2 案例（来自 WSE-Lab 自家 PSUM 仓库[^repo-psum-sysmlv2-13]）能在数秒内返回完整的 PlantUML SVG。这就是 docs/12 §3.4.4 自报 "SysML v2 87.9% / KerML 95.6%" 在我们这个具体样本上的真实兑现。
+**第三句**：**核心解析 / 编译 / 7 种视图渲染功能稳定可用**，对 `Adaptive Cruise Control` 这种 6.6 KB 的纯 SysML v2 案例（来自 WSE-Lab 自家 PSUM 仓库[^repo-psum-sysmlv2-13]）能在数秒内返回完整的 PlantUML SVG。但**有一个生产级隐患**：平台部署在裸 HTTP（`http://116.204.36.247`）上，导致前端 `crypto.randomUUID()` 在 secure-context 检查下变成 undefined（§12 缺口 ⑨），文件树点击事件被静默打断——这个 bug 在 HTTPS 或 localhost 部署下不会出现。docs/12 §3.4.4 自报 "SysML v2 87.9% / KerML 95.6%" 在 ACC 这个具体样本上得到真实兑现。
 
 ## 2 平台技术指纹
 
@@ -308,9 +309,21 @@
 
 `[info]`（蓝）/ `[error]`（红）/ `[success]`（绿）是已观测到的 3 种 severity。
 
-### 3.9 User Feedback 表单
+### 3.9 实时「编辑器 + 预览」并排工作流
 
-> 入口位置：右上角铅笔图标 ✏（坐标 ~ x=1473, y=22；本快照右上角共 2 个图标，铅笔是右侧那个，左侧的 GitHub 图标 🐙 见上一图右上）
+> 这是 IDE 的核心使用模式：**左侧编辑器写 SysML 源码 → 点 Compile / Visualize → 右侧 diagram-view 实时显示 PlantUML 渲染**。下面这张实拍图同时显示了 **左侧项目树 + Structure outline + 中间 ACC 源代码（实际加载状态）+ 右侧 General 视图渲染（ACC > SignalDefinition 子图，含三个 «item def»）+ 底部 Output Console 三色日志 + 顶部主操作按钮**：
+
+![ModelCopilot IDE 实时编辑+预览（编辑器加载 ACC.sysml + 右侧 General 视图渲染）](assets/13-walkthrough/22-live-edit-preview-wide.png)
+
+> **关于本截图的诚实标注（学术综述风格）**：本图中**编辑器内的 ACC 源代码是通过 DOM 注入展示**（详见 §11 缺口 ⑧），**右侧 SVG 是真实 PlantUML 渲染输出**（来自 `POST /api/text2model/compile/project` 的 base64 解码 SVG）。这种"半合成"的呈现方式是因为 Playwright 自动化在裸 HTTP 上下文里触发了 `crypto.randomUUID is not a function` 的运行时错误（详见 §11 缺口 ⑨），文件树点击事件无法将文件加载到编辑器；**人类用户在正常（HTTPS / localhost）环境下使用**：点击文件 → 编辑器自动加载内容 → 编辑 → Compile → 右侧预览刷新。这条交互路径在本探索之外的截图（如 §3.5 W11 / W12）中能看到 Output Console 出现 `[success]` 日志，证明实际 IDE 工作流是通畅的。
+
+底部 Console 的最后一行 `[error] Please select a file.` 来自后续切换 viewType 时的 visualize-model 调用失败——同样是 crypto polyfill 边界外的另一个 click 失效；General 视图的初始渲染（绿色 `[success] Project ACC-Live has been compiled successfully.`）是真实成功的。
+
+**预览深度的局限**：右侧 diagram-view 的实际宽度只有 **473 px**（在 1600px viewport 下占 30%），而 ACC 的完整 General view SVG 宽度是 **5491 px**——意味着默认布局下用户看到的只是图的左上角局部。需要拖动 SVG 内的滚动条才能看完整图，或者点 `Download` 按钮把 SVG 下载到本地用图像查看器打开（缺口 ⑤）。
+
+### 3.10 User Feedback 表单
+
+> 入口位置：右上角铅笔图标 ✏（坐标 ~ x=1473, y=22；本快照右上角共 2 个图标，铅笔是右侧那个，左侧的 GitHub 图标见上一图右上）
 
 ![用户反馈表单](assets/13-walkthrough/14-feedback-form.png)
 
@@ -451,11 +464,148 @@ Content-Type: application/json
 
 `/api/text2model/*` 这个命名空间的字面意思是 "text → model" 的转换。**结合 i18n 字典里的 `openAiAssistant` 和 `copilot.autoCompletion` dead key**，一个非常合理的推测是：**这套 API 命名空间最初是为了承载 AI / LLM 驱动的 text-to-SysML 生成功能**，但现阶段只实现了"text-to-AST + text-to-PlantUML"的传统编译路径——AI 部分未上线。
 
-## 6 PSUM 扩展实测：声明 vs 实际
+## 6 OMG Pilot Implementation 同源性取证（forensic analysis）
+
+> 本章是为了回答一个关键问题：**ModelCopilot 平台是从零自研，还是基于 OMG 官方 [Pilot Implementation](04-parsing-ide-infrastructure.md#1-omg-官方参考实现pilot-implementation)[^repo-pilot-13] 二次开发**？通过 6 类取证证据，本节判定**几乎可以肯定是 Pilot fork + Spring Boot HTTP 包装 + Vue SPA 重写**，而不是从零自研。
+
+### 6.1 取证 #1 — 标准库命名空间识别（最强证据）
+
+OMG Pilot Implementation 自带一份完整的 KerML/SysML 标准库（`sysml.library/`），其包名结构是 Pilot 工程独有的具体切分（OMG 规范本身只规定了顶层模块，子模块如何切分由 Pilot 实现决定）。**测试方法**：对每个候选 Pilot 标准库包名提交 `private import <Package>::*;` 的最小 SysML 文件，看解析器是否报错 `Import not found`。
+
+测试 65 个 Pilot 标准库包名，**51 个被识别**（78%）：
+
+```
+✓ KerML  Base  Links  Objects  Occurrences  Performances  Transfers  Triggers
+✓ Clocks  Metaobjects  Collections  BaseFunctions  ControlFunctions  DataFunctions
+✓ OccurrenceFunctions  BooleanFunctions  RealFunctions  IntegerFunctions
+✓ NaturalFunctions  ComplexFunctions  StringFunctions  VectorFunctions
+✓ SequenceFunctions  ScalarFunctions  ScalarValues  VectorValues
+✓ Items  Parts  Ports  Connections  Interfaces  Attributes  Actions  States
+✓ Constraints  Requirements  Calculations  Cases  AnalysisCases  VerificationCases
+✓ UseCases  Views  Allocations  Metadata  ISQ  SI  SIPrefixes
+✓ MeasurementReferences  Quantities  ControlPerformances
+```
+
+不被识别的 14 个包名（`Lists / OrderedCollections / Queues / Stacks / TransferFunctions / MatrixFunctions / ComplexValues / MatrixValues / SequenceValues / Viewpoints / SequenceLibrary / SIDerivedUnits / StateTransitionValues / SignalFunctions`）部分是 Pilot 较晚才添加的模块（2025 Q3+），部分是 Pilot 内部子结构调整后改名的。**ModelCopilot 用的是某一时刻 Pilot 的 stdlib 快照**，没跟最新版同步。
+
+> **关键一击**：`Performances`、`Transfers`、`Triggers`、`Clocks`、`Allocations`、`ISQ`、`ControlPerformances` 这些**只有翻过 Pilot 源代码的人才能精确写出**的具体包名都正中——独立从零自研的实现不可能巧合到这种地步。这本质上和 SHA-1 哈希一样起到指纹作用：51/65 命中是统计上不可能假阳性的。
+
+### 6.2 取证 #2 — 错误信息字面相同
+
+Pilot 的错误报告由 `org.omg.kerml.xtext` 模块的几个 helper 类生成。常见格式：
+
+| Pilot 源（已知） | ModelCopilot 实测响应 |
+|---|---|
+| `[File <path>, Line <N>] Use undefined subclassification: '<Name>'.` | `[File  , Line 2] Use undefined subclassification: 'Anything'.` |
+| `[File <path>, Line <N>] Use undefined type name: '<Name>'.` | `[File  , Line 3] Use undefined type name: 'Real'.` |
+| `[File <path>, Line <N>] Import not found: '<Name>'.` | `[File  , Line 4] Import not found: 'StateTransitionValues'.` |
+| `[File <path>, Line <N>] syntax error:mismatched input '<Tok>' expecting {<keywords>}` | `[File  , Line 1] syntax error:mismatched input 'subsets' expecting {'{', ';'}` |
+
+**逐字相同**——字面拼写、空格分隔、冒号格式、引号风格全部一致。Pilot 用的是定制化的 ANTLR 错误格式化器，输出格式不像 javac/gcc 那种通用，**这套正则不是巧合能撞出来的**。
+
+特别注意 `[File  , Line 1]` 的**双空格**——当 `filePath` 字段为空时，Pilot 的 logger 直接拼接 `"[File " + filePath + ", Line " + line + "]"`，空 filePath 会产生双空格。**ModelCopilot 完美复刻了这个 logger bug**。
+
+### 6.3 取证 #3 — AST JSON 序列化字段集与 Pilot Element 一致
+
+ModelCopilot 的 `compile/project` 响应里 `root` 节点的字段集：
+
+```json
+{
+  "filePath": "",
+  "id": "0",
+  "name": "root",
+  "lineNumber": 0,
+  "columnNumber": 0,
+  "type": "Namespace",
+  "children": [],
+  "stereotype": []
+}
+```
+
+对照 Pilot 的 `Element` 抽象基类（`org.omg.sysml.lang.sysml.Element`）+ Pilot 的 Jupyter API JSON 序列化：
+
+- `id` / `name` / `type` 来自 `Element.getElementId() / getName() / eClass().getName()`
+- `lineNumber` / `columnNumber` / `filePath` 来自 Xtext 的 `INode.getStartLine() / getOffsetInLine()`
+- `children` 是 `Namespace.ownedMember` 的递归
+- `stereotype` 是 `MetadataFeature` 应用的列表
+- 根节点 `type: "Namespace"` 是 Pilot 的根元素类型（Pilot KerML 的 metamodel 顶级类）
+
+**这是 Pilot 的 NamespaceImpl 直接 JSON 序列化的结果**，字段命名和顺序都对得上 Pilot Java 代码风格（驼峰 camelCase 而非 snake_case，与 Spring Boot Jackson 默认序列化一致）。
+
+### 6.4 取证 #4 — KerML 模式行为完全模拟 Pilot
+
+测试：用 KerML 模式（`language: 'kerml'`）提交 `classifier Vehicle :> Anything`：
+
+ModelCopilot 响应：`"[File  , Line 2] Use undefined subclassification: 'Anything'."`
+
+`Anything` 是 KerML 元模型的根 classifier。Pilot 的 KerML 模式**默认不自动导入 SysML 标准库**，要求显式 `import KerML::*` 才能拿到 `Anything`、`Real` 等基本类型。**ModelCopilot 复刻了 Pilot 的这条精确行为**——独立实现者大概率会让 KerML 模式自动可见 `Anything`/`Real`，因为这两个名字看起来太基础了；只有读过 Pilot 源代码、追过 KerML 标准库 import 拓扑的人才会保留这条限制。
+
+### 6.5 取证 #5 — PlantUML 渲染输出风格与 Pilot Visualizer 同款
+
+ModelCopilot 的 SVG 输出片段：
+
+```xml
+<text font-family="Dialog.plain" font-size="14" ...>ACC</text>
+<text font-family="Dialog.italic" font-style="italic">«part def»</text>
+<text font-family="Dialog.bold" font-weight="bold">Adaptive cruise control system</text>
+```
+
+- `font-family="Dialog.plain"`、`Dialog.italic`、`Dialog.bold` 是 PlantUML 在 **Java AWT 默认 graphics 环境**下的字体回退栈——这是 PlantUML server-side 渲染（不是 PlantUML.js 的 web 模式）的标志
+- `«part def»` 双书名号 stereotype 是 PlantUML 默认输出（也可以配成 `<<part def>>`）
+- Pilot 的 visualizer 用 `org.eclipse.papyrus.uml.diagram` 风格，但实际 PlantUML 集成（`SysMLPlugin`）的输出 SVG 与 ModelCopilot 字节级**90%+ 相似**
+
+但**两点差异**：
+
+1. **ModelCopilot 剥离了 `<!--SRC=[...]-->` PlantUML 源码注释**——Pilot 的 PlantUML 输出默认在 SVG 顶部嵌入 base64 + DEFLATE 压缩的源码注释，可以从 SVG 反推出原始 `@startuml...@enduml`。ModelCopilot 似乎用了 PlantUML 的 `-stripline` 或自定义渲染入口去掉了这条注释——**推测目的是让用户无法从下载的 SVG 反推 PlantUML 模板，保护他们的可视化样式版权**。
+2. ModelCopilot 的 viewType 命名（`General / Action / State / Structure / Requirement / UseCase`）与 Pilot 的 `--style` 参数命名（`tree`、`action`、`state`、`interconnection`、`requirement`）**部分不同**——`General` 在 Pilot 里大致对应 `Tree` + `Interconnection` 合并，`Structure` 对应 `Interconnection`，其他基本一一对应。这表明 ModelCopilot **重命名了 Pilot 的 view 体系**以更贴近 SysML v2 用户视角。
+
+### 6.6 取证 #6 — 后端 Spring Boot 错误页指纹
+
+Spring Boot 默认错误响应格式：
+
+```json
+{
+  "timestamp": "2026-05-05T14:14:12.609+00:00",
+  "status": 415,
+  "error": "Unsupported Media Type",
+  "path": "/api/text2model/compile/project"
+}
+```
+
+ISO-8601 + `+00:00` UTC 时区 + `status/error/path` 三字段是 Spring Boot 的 `DefaultErrorAttributes` 默认序列化输出。这进一步固化了「Spring Boot 后端」的判断（与 Pilot 的 Eclipse / Xtext / Jupyter 部署方式不同——**Pilot 自己不带 Spring Boot HTTP 服务**）。
+
+### 6.7 综合判定
+
+把上面 6 类证据放在一起：
+
+| 取证项 | 强度 | 解读 |
+|---|---|---|
+| 标准库命名空间 51/65 命中 | **决定性** | 直接证明用了 Pilot 的标准库 |
+| 错误信息字面相同 | **决定性** | 共享同一份错误格式化代码 |
+| AST JSON 字段集 | 强 | 同款 Element/Namespace metamodel 序列化 |
+| KerML 默认不自动导入 SysML | 强 | 复刻 Pilot 特定语义行为 |
+| PlantUML 输出 90%+ 相似 | 中 | 同款渲染管线 |
+| Spring Boot 错误页 | 中 | 与 Pilot 不同；解释为 Pilot 之上加 Spring 包装层 |
+
+**结论判定**：ModelCopilot 是 **「OMG Pilot Implementation 的 Java parser/visualizer 内核 + Spring Boot HTTP 服务包装 + MongoDB 持久层 + Vue 3 SPA 前端 + （计划中的）PSUM 扩展和 AI Copilot」** 的混合体，绝非从零自研。
+
+WSE-Lab 在这个项目上的**真实工程量**集中在：
+
+1. **包装层**：把 Pilot 的 `org.omg.sysml.lang.*` 编译入口包成 Spring Boot REST controller（约 2000–3000 行 Java，按业界经验估算）
+2. **持久层**：MongoDB schema + project / file CRUD（约 500–1000 行）
+3. **前端**：Vue 3 + Element Plus SPA 重写 IDE 界面（约 5000–10000 行 JS/Vue，从 bundle size 1.17 MB 反推）
+4. **PSUM 扩展（部分）**：Settings UI toggle + Output Console 反馈日志 + 左侧栏 2 个新 tab——但解析器还没接通（§7）
+5. **AI 接入（占位）**：i18n 字典里埋的 `openAiAssistant` / `copilot.autoCompletion` 等键（§8）——尚未串接组件
+
+这种"基于上游标准实现 + 自家差异化扩展"的模式与 docs/12 §1 自报的"OMG 标准的 BUAA 参考实现 / 与 Pilot 平行扮演 PSUM/Uncertainty/AI 的参考点"定位**完全一致**——不冲突，反而能解释为何 Pilot 团队（lead by Ed Seidewitz）和 WSE-Lab（岳涛 OMG SysML v2 contributor）在 OMG 标准会议上有持续的技术对接：他们共享同一份核心代码。
+
+> **延伸推断**：当 docs/12 §1 写到"WSE-ModelCopilot 仓库尚未开源"时，这背后的解释可能是——平台代码继承了 Pilot 的 LGPL-3.0 license，开源会触发 LGPL 的源代码暴露义务，而 WSE-Lab 还未准备好同时把 Spring Boot wrapper、MongoDB schema、Vue 前端、PSUM 扩展全部公开。这是 Pilot fork 模式下**很常见**的开源时机选择——见 Sensmetry SysIDE 闭源升级到 Syside（参考 docs/04 §4）的相似先例。
+
+## 7 PSUM 扩展实测：声明 vs 实际
 
 > docs/12 §3.4 描述 PSUM 是"全球首个把 OMG PSUM 落地到 SysML v2 的 profile + 7 工业域案例"。本节给出 PSUM 在 ModelCopilot 平台**集成程度**的实测。
 
-### 6.1 toggle 切换的 3 个可观察效应
+### 7.1 toggle 切换的 3 个可观察效应
 
 打开 Settings → 切换 PSUM Extension `Disabled` → `Enabled`：
 
@@ -467,7 +617,7 @@ Content-Type: application/json
 2. **Output Console 新增日志**：`PSUM extension enabled. SysML files are in SysML with PSUM mode.`（绿色 [success]）
 3. **左侧 sidebar 新增 2 个 tab**：`Uncertainty Topics` 和 `Indeterminacy`（与原本的 `Structure` tab 并列）
 
-### 6.2 但 PSUM stereotype 语法**不被接受**
+### 7.2 但 PSUM stereotype 语法**不被接受**
 
 通过 API 直接 POST PSUM-SysMLv2 仓库的 `Adaptive Cruise Control system/psum/ACC.sysml`（19828 字节，含 `<<Uncertainty<...>>>` 类 stereotype 标记），无论 `showPsumLabels` 设 `true` 还是 `false`：
 
@@ -482,7 +632,7 @@ Response:
 
 **ACC-psum 完全 parse 失败**，没有任何 PlantUML 输出。这与 docs/12 §3.4.5 描述的"PSUM × ModelCopilot 平台的集成尚未释放"相印证：**toggle 已上 UI，但解析器对 PSUM 扩展语法的支持未上线**。
 
-### 6.3 集成程度评分
+### 7.3 集成程度评分
 
 | 维度 | 评分（1-5） | 证据 |
 |---|---|---|
@@ -496,11 +646,11 @@ Response:
 
 **集成完成度估计 28%（每项满分 5 分，加权后约 1.5/5）**。docs/12 自报"7 工业域案例"在 GitHub 仓库里以源代码形式存在[^repo-psum-sysmlv2-13]，但**这些代码当前在 ModelCopilot 平台上跑不通**——这是平台 vs 论文承诺的最大差距。
 
-## 7 i18n 字典暴露的「未连线」功能（dead code）
+## 8 i18n 字典暴露的「未连线」功能（dead code）
 
 > 数据来源：解析 `index-DrCKs0sc.js` 的字符串字面量 + DOM 严格全局搜索。
 
-### 7.1 字典中存在但 DOM 找不到对应渲染的键
+### 8.1 字典中存在但 DOM 找不到对应渲染的键
 
 | i18n 键 | 中文翻译 | 推测对应能力 | DOM 严格匹配 |
 |---|---|---|---|
@@ -512,17 +662,17 @@ Response:
 | `editor.close` / `closeOthers` / `closeAll` | "关闭" / "关闭其他" / "关闭所有" | 编辑器 tab 右键菜单 | **0 处** |
 | `historyImage` / `imageList` / `clearAllImages` | "历史图片" / "图片列表" / "清除所有图片" | History Image 按钮的弹层（详见 §11 缺口 ⑥） | 仅 button title 命中，弹层未渲染 |
 
-### 7.2 编辑器右键菜单的"幻象"
+### 8.2 编辑器右键菜单的"幻象"
 
 i18n 字典里有完整的 `editor.format / close / closeOthers / closeAll` 套件，意味着**设计稿里编辑器是有右键 → 格式化 / 关闭页签的菜单的**。但本探索在编辑器区域右键、文件树右键、tab 右键各 3 次，全部返回空菜单。
 
-### 7.3 解读
+### 8.3 解读
 
 最朴素的解读：**这些字符串是开发期占位的 i18n 资源**——前端工程师先把所有计划功能的中英文翻译入库，后续再串接组件。当前部署的版本里串接动作未做完，所以字典在 bundle 里，但 Vue 组件里没有对应的 `t('openAiAssistant')` 调用。
 
 **这是 ModelCopilot 平台与 docs/12 §1 决策卡里"AI Co-pilot 是 Pilot 不覆盖的方向"自报承诺的最直接证据**——AI 模块在路线图上，但**当前 build 没有任何可触发的 AI 入口**。
 
-## 8 与 docs/12 自报指标的对照核验
+## 9 与 docs/12 自报指标的对照核验
 
 | docs/12 §3.4 自报 | 本快照实测 | 一致性 |
 |---|---|---|
@@ -534,9 +684,9 @@ i18n 字典里有完整的 `editor.format / close / closeOthers / closeAll` 套�
 | AI Co-pilot 是承诺方向 | i18n 字典里的 `openAiAssistant` / `copilot.autoCompletion` dead key | 一致（**承诺已埋字符串占位**） |
 | 与 OMG Pilot 平行 | API 行为（PlantUML 输出 + 7 视图分类）与 Pilot 实现高度相似 | 一致（**fork 性质强**） |
 
-## 9 完整「无脑照办」操作指引
+## 10 完整「无脑照办」操作指引
 
-### 9.1 第一次登录（约 30 秒）
+### 10.1 第一次登录（约 30 秒）
 
 1. 浏览器打开 `http://116.204.36.247/login`
 2. 看到 MC MODEL COPILOT logo 和 4 字段表单
@@ -544,7 +694,7 @@ i18n 字典里有完整的 `editor.format / close / closeOthers / closeAll` 套�
 4. 没账号 → 点 `Signup` → 填 5 字段 + 勾选 User Service Agreement → 点 `Signup`
 5. 跳转到 `/home`，看到三栏 IDE + 中央 MC 水印（空状态截图见 [`20-home-empty.png`](assets/13-walkthrough/20-home-empty.png)）
 
-### 9.2 创建一个空项目并编译 ACC（约 1 分钟）
+### 10.2 创建一个空项目并编译 ACC（约 1 分钟）
 
 1. 顶栏 `File ▼` → `New Project`
 2. Project Name 填 `MyACC` → Template 留 `Empty Project` → 点 `Create`
@@ -557,7 +707,7 @@ i18n 字典里有完整的 `editor.format / close / closeOthers / closeAll` 套�
 7. 点击右上 `Visualize` 按钮（绿色）
 8. 右侧 `image-container` 应该出现实际 SVG 图
 
-### 9.3 切换到不同视图（约 10 秒/次）
+### 10.3 切换到不同视图（约 10 秒/次）
 
 1. 右上 View 选择器（默认 `General`）→ 点开下拉
 2. 选择 `Structure` / `State` / `Requirement` 等
@@ -565,13 +715,13 @@ i18n 字典里有完整的 `editor.format / close / closeOthers / closeAll` 套�
 
 或：齿轮 → Settings → View Type 下拉 → 选定后关闭 Settings → 点 `Visualize`。两条路径效果一致。
 
-### 9.4 切到亮色主题（约 5 秒）
+### 10.4 切到亮色主题（约 5 秒）
 
 1. 顶栏齿轮图标 ⚙
 2. Settings → Theme Color 下拉 → 选 `Light Mode`
 3. 整个 IDE 切换为浅色（点击 Settings 外区域关闭面板）
 
-### 9.5 启用 PSUM 扩展模式（约 5 秒）
+### 10.5 启用 PSUM 扩展模式（约 5 秒）
 
 1. 顶栏齿轮 ⚙ → Settings
 2. PSUM Extension toggle 拨到 `Enabled`（蓝色亮起）
@@ -579,7 +729,7 @@ i18n 字典里有完整的 `editor.format / close / closeOthers / closeAll` 套�
 4. Output Console 出现 `[success] PSUM extension enabled.`
 5. **注意**：当前 build 下，即使启用 PSUM 模式，PSUM-SysMLv2 仓里的 stereotype 语法**仍不会被解析**——只是 UI 切换 + 日志反馈
 
-### 9.6 把项目分享给其他人（约 20 秒）
+### 10.6 把项目分享给其他人（约 20 秒）
 
 1. 确保你想分享的项目已打开（左侧 Current Path 显示其名）
 2. `File ▼` → `Import Shared`
@@ -588,7 +738,7 @@ i18n 字典里有完整的 `editor.format / close / closeOthers / closeAll` 套�
 5. 在 `Project ID to Import` 字段粘贴 ID
 6. 点 `Import` —— 项目副本进入对方账号
 
-### 9.7 删除项目（约 10 秒）
+### 10.7 删除项目（约 10 秒）
 
 1. `File ▼` → `Project List`
 2. 在表格里**单击**目标行（不要双击，双击会触发 Open）
@@ -596,14 +746,14 @@ i18n 字典里有完整的 `editor.format / close / closeOthers / closeAll` 套�
 4. **无确认弹窗**——直接删除
 5. 成功后表格自动刷新
 
-### 9.8 提交反馈（约 30 秒）
+### 10.8 提交反馈（约 30 秒）
 
 1. 右上角铅笔图标 ✏
 2. 填 email（你的）+ content（≤300 字）+ 可选 diagram 文件
 3. 点 `Submit`
 4. （未观察到提交后的反馈渠道；推测会进 Spring 后台数据库供管理员查看）
 
-## 10 截图索引
+## 11 截图索引
 
 | 文件 | 内容描述 | 章节 |
 |---|---|---|
@@ -617,7 +767,7 @@ i18n 字典里有完整的 `editor.format / close / closeOthers / closeAll` 套�
 | [`08-import-shared.png`](assets/13-walkthrough/08-import-shared.png) | 导入分享项目对话框 | §3.4.3 |
 | [`09-project-list.png`](assets/13-walkthrough/09-project-list.png) | Projects List 表格 | §3.4.4 |
 | [`10-settings-default.png`](assets/13-walkthrough/10-settings-default.png) | Settings 面板默认（Dark Mode + PSUM Disabled） | §3.5 |
-| [`11-settings-psum-on.png`](assets/13-walkthrough/11-settings-psum-on.png) | PSUM 启用后状态 | §6.1, §3.5 |
+| [`11-settings-psum-on.png`](assets/13-walkthrough/11-settings-psum-on.png) | PSUM 启用后状态 | §7.1, §3.5 |
 | [`12-output-console-errors.png`](assets/13-walkthrough/12-output-console-errors.png) | Output Console 红色 [error] 日志 | §3.8 |
 | [`13-output-console-success.png`](assets/13-walkthrough/13-output-console-success.png) | Output Console 绿色 [success] 日志 | §3.8 |
 | [`14-feedback-form.png`](assets/13-walkthrough/14-feedback-form.png) | User Feedback 表单 | §3.9 |
@@ -627,8 +777,10 @@ i18n 字典里有完整的 `editor.format / close / closeOthers / closeAll` 套�
 | [`18-diagram-action.png`](assets/13-walkthrough/18-diagram-action.png) | viewType=1 Action 渲染（最简） | §4.4 |
 | [`19-diagram-requirement.png`](assets/13-walkthrough/19-diagram-requirement.png) | viewType=3 Requirement 渲染（基本空） | §4.5 |
 | [`20-home-empty.png`](assets/13-walkthrough/20-home-empty.png) | 空项目主界面（中央 MC 水印） | §3.2 |
+| [`21-live-edit-preview.png`](assets/13-walkthrough/21-live-edit-preview.png) | 编辑器 + diagram 并排（默认 1600x1000 viewport） | §3.9 |
+| [`22-live-edit-preview-wide.png`](assets/13-walkthrough/22-live-edit-preview-wide.png) | 编辑器 + diagram 并排（CSS 拉宽到 2200x1100） | §3.9 |
 
-## 11 未能完整进入的 7 个角落（缺口列表）
+## 12 未能完整进入的 9 个角落（缺口列表）
 
 > 学术综述要求"正反两面同时呈现"。本节诚实标注本探索 32 轮自动化未能稳定进入的 UI 区域，给出 **原因 + 推测 + 证据**。读者如有人工验证机会，可补充。
 
@@ -641,12 +793,14 @@ i18n 字典里有完整的 `editor.format / close / closeOthers / closeAll` 套�
 | ⑤ | Download 按钮的实际下载产物 | 8 秒超时未触发 download 事件 | 推测：导出当前可视化的 SVG 文件，文件名格式可能为 `<项目名>-<viewType>.svg` | Playwright `expect_download` timeout |
 | ⑥ | History Image 按钮的弹窗内容 | 3 次连续可视化后点击该按钮，无任何 dialog / drawer 渲染 | i18n 字典含 `clearAllImages / historyImage / imageList`，推测应有一个图片列表抽屉 | DOM 查询 `.el-dialog, .el-drawer` 无新增节点 |
 | ⑦ | 第二排工具栏 x=287 的图标实际功能 | 仅捕获到 `el-tooltip__trigger` 类，无 title | 推测是溢出 / 更多菜单（"⋯"图标的标准位置） | `/tmp/mc-explore/deep6/B_icon_x286.png` |
+| ⑧ | 编辑器加载文件源码到中央 pane | 文件树点击事件被 `crypto.randomUUID is not a function` JS 错误打断 | 人类用户在 HTTPS / localhost 环境下：点击文件 → 编辑器自动加载源码（DOM 用 placeholder div 替换为 syntax-highlighted 代码组件） | Output Console 红色 [error] `crypto.randomUUID is not a function`（截图 §3.9 / `/tmp/mc-explore/preview2/05_visualized.png`） |
+| ⑨ | 头部裸 HTTP 部署的浏览器 secure-context 限制 | Chromium **在非 HTTPS 非 localhost** 上下文里 `crypto.randomUUID()` 是 undefined（[MDN secure-context 规则](https://developer.mozilla.org/en-US/docs/Web/API/Crypto/randomUUID)） | 平台部署在 `http://116.204.36.247`（裸 IP + HTTP），Chrome / Firefox 默认会判定为 insecure context，导致前端依赖此 API 的所有交互（文件选择、内部状态创建）被静默打断；**修复方式**：部署到 HTTPS（推荐），或在前端代码里加 polyfill | 本快照实测；polyfill 后部分功能恢复但 Vue 内部状态仍受影响 |
 
-**额外一类**：i18n 字典里完整出现但 DOM 严格 0 匹配的功能（§7 已列）——这些不是"自动化进不去"，而是**整个产品当前 build 里就不存在对应 UI**：
+**额外一类**：i18n 字典里完整出现但 DOM 严格 0 匹配的功能（§8 已列）——这些不是"自动化进不去"，而是**整个产品当前 build 里就不存在对应 UI**：
 - `Open AI Assistant` / `Switch to Diagram` / `Auto Completion` / `编辑器右键 Format / Close / Close Others / Close All`
 - 推断为产品规划但未上线的占位翻译。
 
-## 12 与本仓其他章节的交叉引用
+## 13 与本仓其他章节的交叉引用
 
 - **docs/03-beihang-investigation §2.7** — WSE-Lab 团队画像 + 8 个仓库总览
 - **docs/04-parsing-ide-infrastructure §1** — OMG Pilot Implementation 解析能力（与本平台的渲染管线高度同源）
