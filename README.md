@@ -13,7 +13,7 @@
 3. **真正胜过前辈的四点**：文本一等公民、KerML 分层架构、REST/HTTP API 入标准、KPAR 包格式 + sysand cargo 范式包管理[^repo-sysand]。这四点构成 v2 web/CI/LLM 集成的代际飞跃，未来 3–5 年生态会快速补齐。
 4. **最有价值的开源四件套**（覆盖 ~80% 用例）= [Eclipse SysON][^repo-syson] 图形建模 + [Open-MBEE Flexo MMS][^repo-flexo] 图存储/REST + [daltskin LSP][^repo-daltskin-lsp] / [elan8 spec42][^repo-spec42] 编辑器 + [sensmetry sysand][^repo-sysand] 包管理。
 5. **生态最大隐忧**：Sensmetry 把 SysIDE 闭源升级到商业 Syside Editor[^syside-rebirth]（VS Code 4254 安装、性能 50× legacy）；Gamma 的 SysML v2 verification 前端代码没释放[^molnar-2024]；Living SysML Blueprint[^teodorov-2025] 与 Imandra[^imandra] 都是论文 / 闭源。
-6. **北航专项**：与请求者原始猜测**几乎完全错位**，但实锤存在——岳涛教授[^yue-tao]是 OMG SysML v2 standardisation 的直接 contributor 与 PSUM co-chair；吴际副教授为 OMG PSUM 工作组北航代表[^omg-psum]；2026-02 三作者全部署名 `@buaa.edu.cn` 的 *Uncertainty Modeling for SysML v2*[^zhang-2026] 是首篇北航全员主导的纯 v2 论文。详见 [docs/03-beihang-investigation.md](docs/03-beihang-investigation.md)。
+6. **北航专项 + 中文 MBSE 生态**（已扩展为全国全景）：北航 SysML/MBSE 力量横跨 5 个学院（计算机 / 软件 / 航空 / 可靠性 / 机械）。除已知岳涛[^yue-tao] + 吴际[^omg-psum] + 葛宁 + 胡春明 四人外，第二轮深挖发现**鲁金直**（航空学院，KARMA 语言发明者，国家标准 GB/T 45803-2025 核心起草人）+ 康锐（中国 MBSE 联盟可靠性专委会主任）+ 刘继红（北航 MBSE 教学专著主编）。**国家标准 GB/T 45803-2025**（2025-05 发布、2025-12 实施）选择**自研 KARMA 路径**与 OMG SysML v2 平行——这是中国 MBSE 工具厂商接下来面临的"双轨合规"格局。**杭州华望 M-Design v2**（2025-09-14 alpha）是国内**唯一**公开商用化的 SysML v2 平台；2025-10 出版国内首部 SysML v2 中文专著《精华透视：SysML v2》（科学出版社）。详见 [docs/03-beihang-investigation.md](docs/03-beihang-investigation.md)。
 
 ---
 
@@ -92,7 +92,7 @@
 | 00 | [总览](docs/00-overview.md) | 整体生态全景、关键时间节点、调研方法 |
 | 01 | [标准状态](docs/01-standard-status.md) | OMG Final Adoption、KerML 分层、规范结构、API & Services |
 | 02 | [学术地图](docs/02-academic-landscape.md) | 13 篇核心论文、9 个主要研究团队、工业案例 |
-| 03 | [北航专项](docs/03-beihang-investigation.md) | 实锤、邻近信号、否定证据、易混淆点勘误 |
+| 03 | [北航专项 + 中文 MBSE 生态](docs/03-beihang-investigation.md) | 北航 5 学院横向矩阵（计算机/软件/航空/可靠性/机械）+ 鲁金直 KARMA + 国标 GB/T 45803-2025 + 华望 M-Design v2（国内首个 v2 商用平台）+ 17 篇 CNKI 中文文献 + 微信公众号生态 |
 | 04 | [解析 / IDE 基础设施](docs/04-parsing-ide-infrastructure.md) | 6 套独立 parser、Tree-sitter 三家、编辑器扩展、KPAR/sysand |
 | 05 | [形式化与验证](docs/05-formal-verification.md) | 11 路径深度评估、HAMR/SysMD/verified-mbse/Gamma 等 |
 | 06 | [可视化与协作](docs/06-visualization-collaboration.md) | SysON 架构、API 端点矩阵、Flexo MMS、OSLC、MCP、diff/merge |

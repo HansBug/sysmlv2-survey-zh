@@ -77,6 +77,10 @@ OMG SysML v2 自 2017 年立项[^seidewitz-2017]、2023 年起进入 Beta 公开
 | 2026-02 | daltskin/sysml-v2-grammar 仓库初始化（v2025-12 tag），首版 ANTLR4 文法发布；Siemens Capital 2512 集成 SysML v2[^vendor-siemens-cap]；北航 *Uncertainty Modeling for SysML v2* arXiv 上线[^zhang-2026] |
 | 2026-03 | OMG 4 份规范以 `formal/2026-03-0x` 正式出版；daltskin v2026.03.0 release |
 | 2026-04 | Sensmetry 把 SysIDE 闭源升级到商业 Syside Editor[^syside-rebirth]；daltskin v2026.03.2 + PR #6 多 SDK target；空客 Apollo 11 v2 模型 latest commit |
+| 2025-05-30 | **国家标准 GB/T 45803-2025**《系统与软件工程 基于模型的系统工程 统一架构建模语言》发布；起草单位含**北京航空航天大学**（鲁金直为核心起草人）+ 北京理工大学 + 中国电子技术标准化研究院 + 商飞 + 兵器 + 航天等 16 家[^gb-45803-overview] |
+| 2025-09-14 | **杭州华望 M-Design v2 alpha 发布**——国内唯一公开商用化的 SysML v2 平台 |
+| 2025-10 | 国内首部 SysML v2 中文专著《精华透视：SysML v2》（刘玉生 等，科学出版社） |
+| 2025-12-01 | GB/T 45803-2025 正式实施 |
 | 2026-05 | Eclipse SysON `v2026.3.0` 发布[^repo-syson]；HAMR + santoslab 真案例 4 平台 CI 工作流稳定[^repo-santoslab]；本仓库基准日期 |
 
 ## 6 五维度速判（详见各章）
@@ -91,14 +95,18 @@ OMG SysML v2 自 2017 年立项[^seidewitz-2017]、2023 年起进入 Beta 公开
 
 ## 7 中国语境
 
-中文圈对 SysML v2 的参与目前主要集中在四处：
+中文圈对 SysML v2 / MBSE 的参与已经形成**学术 + 国家标准 + 商用 + 社区**四位一体格局，详见 [docs/03-beihang-investigation.md](03-beihang-investigation.md)。摘要：
 
-1. **北航**：岳涛教授（OMG 标准化 contributor、PSUM 标准 co-chair）、吴际副教授（OMG PSUM 工作组北航代表）、葛宁 / 胡春明团队（LLM × SysML 实证）；2026-02 三作者全员北航的 *Uncertainty Modeling for SysML v2* arXiv 论文。详见 [03-beihang-investigation.md](03-beihang-investigation.md)。
-2. **北大**：金芝团队 SysMBench 是首个公开的 NL → 系统模型基准[^jin-2025]；勿与北航混淆。
-3. **大连理工**：Ruizhe Yang 的 [SysMLine][^repo-sysmline]、[SysMini][^repo-sysmini]、[SysMLOC][^repo-sysmloc]、[CODES][^repo-codes]——国内**唯一**已公开多仓库 SysML v2 工具与语料的团队，CubeSat 任务模型尤其值得参考。
-4. **个人贡献者**：LnYo-Cly、shangchong123、f304646673、cdfeih、lengjing 等多位中国研究者贡献小型语料/学习项目（详 [11 §3.6](11-real-world-corpora.md#36-中文社区贡献小节)）。
+1. **北航**（5 学院横向矩阵）：岳涛 / 吴际（OMG SysML v2 + PSUM 标准化）、葛宁 / 胡春明（LLM × SysML 实证）、**鲁金直**（航空学院，KARMA 语言发明者 + 国家标准核心起草）、康锐（可靠性 MBSE 联盟）、刘继红（机械工程 MBSE 教学专著）。
+2. **北大**：金芝团队 SysMBench 是首个公开的 NL → 系统模型基准[^jin-2025]。
+3. **南航**（杨志斌 + 黄志球）：中文 SysML 自动生成 RNL2SysML 与岳涛长期合作。
+4. **北理工**（王国新 + 阎艳 + Shouxuan Wu）：与北航鲁金直组合"KARMA 兵工方阵"。
+5. **浙大 + 杭州华望**（刘玉生）：国内**唯一**商用 SysML v2 平台 M-Design v2（2025-09 alpha）。
+6. **大连理工 Ruizhe-Yang**：开源贡献最丰，[SysMLine][^repo-sysmline] / [SysMini][^repo-sysmini] / [SysMLOC][^repo-sysmloc] / [CODES][^repo-codes] 系列。
+7. **国家标准 GB/T 45803-2025**：2025-05 发布、2025-12 实施，**自研 KARMA 路径**与 OMG SysML v2 / KerML 平行；中国 MBSE 工具厂商面临"双轨合规"格局。
+8. **个人贡献者 + 中文社区**：LnYo-Cly、cdfeih、hs1520、ypj0202 等 GitHub 个人贡献；UMLChina / 复杂装备 MBSE 联盟 / 杭州华望 MBSE 三大公众号 / CSDN / 知乎专栏；模型巴巴 modelbaba.com 中文门户。
 
-国内**商用 MBSE 厂商**（索为系统、安世亚太、山大华天等）截至 2026-05 **未开源任何 v2 工具**。
+国内**商用 MBSE 厂商**：杭州华望首推 M-Design v2；索为系统、安世亚太、山大华天截至 2026-05 仍以 SysML v1 为主。
 
 ## 8 阅读路径建议
 
@@ -151,3 +159,5 @@ OMG SysML v2 自 2017 年立项[^seidewitz-2017]、2023 年起进入 Beta 公开
 [^repo-sysmloc]: *Ruizhe-Yang/SysMLOC*（大连理工，322 .sysml）。<https://github.com/Ruizhe-Yang/SysMLOC>
 
 [^repo-codes]: *Ruizhe-Yang/CODES*（大连理工 CubeSat 任务模型）。<https://github.com/Ruizhe-Yang/CODES>
+
+[^gb-45803-overview]: GB/T 45803-2025《系统与软件工程 基于模型的系统工程 统一架构建模语言》。国家标准馆. <https://www.ndls.org.cn/standard/detail/28c9f842f8a22c6a6fee666390d8b1c0>
