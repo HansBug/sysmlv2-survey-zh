@@ -100,6 +100,7 @@
 | 08 | [基线对照](docs/08-baseline-comparison.md) | UML/v1/AADL/Modelica/Capella/BPMN/TLA+/Alloy 八语言成熟度 |
 | 09 | [缺口与机会](docs/09-gaps-opportunities.md) | 短中长机会窗口、按维度归类的开源空白 |
 | 10 | [daltskin 深度审计](docs/10-daltskin-deep-audit.md) | daltskin/sysml-v2-grammar 全仓审计——核心结论：基础设施属性只集中在 2 个 `.g4` 文件 + 56 处 ambiguity patch，其余皆为可替换工程胶水。**推荐路径 (C) 只搬 `.g4` + 工具链全自建** |
+| 11 | [真实世界 v2 代码语料调研](docs/11-real-world-corpora.md) | 40 个公开 GitHub 仓 × 3255 个 .sysml 文件实测；daltskin 通过率 94.7% (3083/3255)；工具链分布 + 失败模式 + 旗舰语料推荐；含 30+ 待核仓清单 |
 | ★ | [参考文献](docs/references.md) | 全部标准、论文、仓库、商用产品、教程，含 cite key |
 
 ---
