@@ -257,4 +257,9 @@
 - <a id="repo-sirius-web-tutorial"></a>**[repo-sirius-web-tutorial]** *ObeoNetwork/Sirius-Web-Tutorial*. <https://github.com/ObeoNetwork/Sirius-Web-Tutorial>
 - <a id="repo-cdp4-comet"></a>**[repo-cdp4-comet]** *STARIONGROUP/COMET-IME-Community-Edition*（ECSS-E-TM-10-25 工具）。<https://github.com/STARIONGROUP/COMET-IME-Community-Edition>
 - <a id="jupyter-jvm-basekernel"></a>**[jupyter-jvm-basekernel]** *SpencerPark/jupyter-jvm-basekernel*. <https://github.com/SpencerPark/jupyter-jvm-basekernel>
+- <a id="lsp-spec"></a>**[lsp-spec]** Microsoft. *Language Server Protocol Specification 3.17*（2026-05 仍是当前最新版）. <https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/> · 协议总览 <https://microsoft.github.io/language-server-protocol/>
+- <a id="theia-platform"></a>**[theia-platform]** Eclipse Foundation. *Theia — Cloud & Desktop IDE Platform*. 同时支持 Web 和桌面部署，可直接复用 VS Code 扩展生态。EPL-2.0。<https://theia-ide.org/> · 仓库 <https://github.com/eclipse-theia/theia>
+- <a id="gitpod-coder"></a>**[gitpod-coder]** Gitpod / Coder / GitHub Codespaces — 三家主流"浏览器里跑 VS Code"的云 IDE 服务，底层均依赖 VS Code Server 或 code-server。<https://www.gitpod.io/> · <https://coder.com/> · <https://github.com/features/codespaces>
+- <a id="vendor-cursor"></a>**[vendor-cursor]** Cursor (Anysphere). *Cursor — The AI Code Editor*. VS Code fork，专注 AI 辅助编程；2026-05 已成主流 AI IDE 之一。<https://cursor.com/>
+- <a id="vendor-windsurf"></a>**[vendor-windsurf]** Codeium. *Windsurf Editor*. AI 原生编辑器，与 Cursor 形成 AI IDE 双雄。<https://windsurf.com/>
 

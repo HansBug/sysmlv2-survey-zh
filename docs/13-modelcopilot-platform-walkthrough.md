@@ -15,6 +15,8 @@
 - docs/12 自报指标的对照核验（§9）
 - 13 张「无脑照办」操作指引截图 + 5 张真实 SVG 渲染样本 + 2 张实时编辑预览实拍（§11）
 - 32 轮探索过程中 **未能进入** 的 9 个角落（含一个**裸 HTTP secure-context 限制导致前端崩溃**的关键发现），给出原因 + 推测 + 证据（§12）
+- **三层画像 + 5 维成熟度评分 + 三时间窗路线图预测 + 战略定位 + 风险清单**（§13）
+- **架构选型反思**：为什么 ModelCopilot 没走业内标准的 LSP + VS Code 扩展路径？8 个偏离理由 + Theia 三件套最优解 + 4 个推断（§14）
 
 > **标注**：本章基于一个普通 NORMAL 等级账号 + 自动化探索；不涉及任何破坏性测试；所有截图为真实生产环境。账号 `hansbug@buaa.edu.cn`，token `69f9de5d8d135971b63a6037`，本快照采样于 2026-05-05 21:00 (UTC+8)。
 
@@ -966,7 +968,115 @@ AI Copilot 是这条赛道**所有玩家都看到但谁都没有真正落地**�
 2. **如果你是工程师要采用类似技术栈**：直接用 OMG Pilot Implementation[^repo-pilot-13]，不要依赖 ModelCopilot——后者是前者的 fork + 包装层；除非你确实需要 PSUM 扩展（待 §13.3 中期路线图实现后再评估）
 3. **如果你是国内 MBSE 同行**：把本章作为"国家标准 GB/T 45803 的参考实现现状"读——ModelCopilot 是 BUAA + WSE-Lab 在该标准下的代表性成果之一，但**当前 build 与论文承诺仍有 gap**（PSUM 28% 集成度），跟踪本仓 2026-11 / 2027-05 两个采样点的更新即可
 
-## 14 与本仓其他章节的交叉引用
+## 14 架构选型反思：为什么不是 LSP + VS Code 扩展？
+
+> **本节回应一个自然质疑**——既然 §6 已经证实 ModelCopilot 的解析器内核是 OMG Pilot 的 Java 直接 fork，那为什么不走 2026 年业内的**标准做法**：parser → LSP server → VS Code 扩展（或任意 LSP 客户端）？这是一个直接关系到"为什么这套技术栈值不值得做、能不能复用"的产品定位问题。本章节给出 4 层分析：标准做法画像 / ModelCopilot 偏离的 8 个理由 / VS Code 路径的 steelman / 推断他们没走最优解的 4 个原因。
+
+### 14.1 业界标准做法：parser + LSP + 多客户端
+
+[Language Server Protocol][^lsp-spec-13] 已经是 2026 年语言工具链交付的事实标准。SysML v2 周边走这条路的玩家清单：
+
+| 玩家 | parser | LSP | 主要客户端 | 状态（2026-05） |
+|---|---|---|---|---|
+| **OMG Pilot Implementation** | Xtext 自带 | 有（Xtext 集成） | Eclipse RCP + Jupyter | 221★，活跃[^repo-pilot-13] |
+| **Sensmetry SysIDE / Syside** | 自研 TypeScript | 完整 LSP | VS Code 扩展（4254 安装） | **2026-04 闭源升级**[^syside-rebirth-13]，[VS Code 版仍维护][^vscode-syside-13] |
+| **daltskin/sysml-v2-grammar** | ANTLR4 | 配套 LSP | 配套 VS Code 扩展 | [grammar][^repo-daltskin-grammar-13] / [LSP][^repo-daltskin-lsp-13] / [VS Code][^repo-daltskin-vscode-13] |
+| **Eclipse SysON** | Sirius EMF | LSP-like | Web IDE（Theia 同源） | v2026.3.0[^repo-syson-13] |
+
+这条路的核心思想是：**parser + LSP 是基础设施，编辑器是消费者**。一份 LSP 喂所有客户端，工程经济性极强——VS Code / JetBrains / Neovim / Emacs / Sublime / 任何 LSP 兼容编辑器零成本接入。
+
+### 14.2 ModelCopilot 偏离这条路的 8 个理由
+
+按对团队意图的 charitable 程度排序：
+
+| # | 理由 | 强度 | 实证 |
+|---|---|---|---|
+| 1 | **showcase 优先**：OMG TC 季会、NSFC 评审、国家标准委、投资人——一个 URL + 账号比"装 Java 21 + VS Code + 我们的扩展 + 配 LSP" 友好 100 倍 | ★★★★★ | docs/12 §1 自报"alpha 平台已发布"；公开 IP 部署 |
+| 2 | **PSUM 视觉营销**：他们的差异化扩展（左栏 Uncertainty Topics / Indeterminacy）只有在自家 IDE 能放在顶级位置；VS Code 扩展里这两个 panel 被 Custom Views 子菜单埋掉 | ★★★★ | §3.5 / §7.1 PSUM toggle 后左栏新增 2 tab |
+| 3 | **品牌控制**：`Model Copilot` 名字需要一张面孔——URL + logo + 浏览器 tab title；VS Code 扩展只是 marketplace 列表里的 `WSE-Lab.modelcopilot` 字符串 | ★★★★ | "MC MODEL COPILOT" logo 在每 view 强势出现 |
+| 4 | **AI Copilot 集成想象空间**：VS Code 已经有 GitHub Copilot；做 VS Code 扩展会与 Copilot **正面同框**；自研 IDE 才能定义 "Open AI Assistant" 按钮位置和 prompt 编排 | ★★★★ | §8 i18n `openAiAssistant` / `copilot.autoCompletion` 已埋占位 |
+| 5 | **遥测 / 用户研究价值**：作为研究实验室要研究"工程师怎么用 SysML v2 + AI"——Web 平台能记录每次点击，VS Code 扩展遥测受 Microsoft 政策约束 | ★★★ | 推断；与 docs/12 LLM4MDE 研究线性质相符 |
+| 6 | **中国语境的"自主可控"叙事**：VS Code 是微软的；对国防 / 航天 / 兵器（GB/T 45803[^gb-45803-13] 起草伙伴含商飞、兵器、航天等 16 家）的用户群，依赖美企工具是战略风险 | ★★★ | docs/03 §6；docs/12 §1 |
+| 7 | **持久化 + 极简协作**：MongoDB 后端 → 项目存服务器 → 24-hex ID 分享给同事；VS Code 扩展是 local-first，分享要走 Git。**虽然原始，但是多用户平台的种子** | ★★ | §3.4.3 Import Shared 双 ID 字段 |
+| 8 | **academic dogfooding**：论文里的 7 个 PSUM 案例需要展示橱窗——而非让审稿人自己去 GitHub clone 跑 | ★★ | docs/12 §3.4.5；§7 PSUM 集成度实测 |
+
+### 14.3 VS Code 路径的 steelman：自研壳层的真实工程账
+
+把 ModelCopilot 自研出来的功能**逐项对账** VS Code 现成等价物：
+
+| ModelCopilot 自研 | VS Code 现成 | 工程量差距 |
+|---|---|---|
+| Vue + Element Plus 编辑器壳 | Monaco editor（语法高亮 / 补全 UI / find / replace / 多 tab / undo 全自带） | **~5000 行 vs 0 行** |
+| 自定义文件树（el-tree，且单叶 bug） | VS Code 文件树（多级 / 右键菜单 / 拖拽 / Git 状态） | **~500 行 vs 0 行** |
+| 自定义对话框（New Project / Project List / Import Shared） | VS Code Quick Pick / Command Palette / 工作区切换 | **~800 行 vs 0 行** |
+| Output Console（Problems / Messages / Clear，三色 severity） | VS Code Problems panel + Output panel（自带，多 channel） | **~300 行 vs 0 行** |
+| `crypto.randomUUID` 在裸 HTTP 上 undefined 的 bug | VS Code 不在浏览器跑，无 secure-context 概念 | **生产级隐患 vs 0** |
+| Settings 面板 5 控件 | `settings.json` + 扩展 contribute schema | **~200 行 vs ~50 行** |
+| User Feedback 表单 | `vscode.env.openExternal()` 跳到 GitHub Issues | **~100 行 vs 5 行** |
+| 项目级保存到 MongoDB | VS Code 多 root workspace + Git | **~1000 行 + 部署 vs 0 行** |
+
+**总账**：ModelCopilot 自研壳层 ≈ **5000–10000 行 Vue + 2000 行 Spring Boot wrapper + MongoDB schema + 部署运维成本**，**全部用来换在 VS Code 里 200 行 `package.json` + LSP 配置就能做到的事情**。
+
+加上他们已经在跟 Pilot 同步的语法核心（§6），**真正高 ROI 的工作只剩 PSUM 扩展和 AI Copilot 接入两件事**——这两件 LSP 都能做：
+- PSUM stereotype 注册成 LSP semantic tokens + custom request types
+- AI Copilot 通过 LSP semantic context 接入，可同时被 VS Code、[Cursor][^vendor-cursor-13]、[Windsurf][^vendor-windsurf-13]、Neovim 等任意 AI IDE 利用
+
+### 14.4 真正最优解未被采用：Theia 三件套
+
+业内对"既要工程经济性又要 showcase"的标准答案是：
+
+```
+Tier 1（必做）  SysML v2 LSP server（parse + diagnostics + semantic tokens + 补全）
+Tier 2（高 ROI）VS Code 扩展（wrapping LSP + PlantUML preview）
+Tier 3（showcase 用）Web demo —— 用 Theia / Eclipse Che / Gitpod 同源技术栈[^theia-platform-13][^gitpod-coder-13]
+              直接复用 LSP 和 VS Code 扩展生态，无需重写 5000 行 Vue
+Tier 4（差异化） PSUM 作为 LSP 扩展协议 (custom request types + semantic tokens)
+Tier 5（未来）   AI Copilot 通过 LSP semantic context 接入，与 IDE 解耦
+```
+
+[Theia][^theia-platform-13] 是 Eclipse 基金会维护的 IDE 平台，**同时支持 Web 和桌面**，能直接复用 VS Code 扩展（VSX marketplace），底层与 [Gitpod / GitHub Codespaces / Coder][^gitpod-coder-13] 共享同一套技术栈。**这条路同时满足 showcase（URL 即用，无需安装）+ 工程经济性（不重写编辑器壳）+ 差异化（PSUM 通过 LSP 扩展协议）+ AI 友好（与 IDE 解耦）**。
+
+具体的 ROI 对比：
+- **VS Code 扩展上 marketplace**：~1 周，bundle ~50 KB（vs 现在 1.17 MB SPA）
+- **Theia Web demo**：复用上面的 LSP + 扩展，~1 周搭建，跟 ModelCopilot 现在的 URL 同样易用
+- **PSUM 在 VS Code 里展示**：通过扩展 `contributes.viewsContainers` 添加侧栏 panel，展示效果不弱于 ModelCopilot 当前的左栏 tab
+- **AI Copilot**：LSP semantic context 是 GitHub Copilot / Cursor / Windsurf 的喂养格式——做对 LSP，AI 集成是免费的
+
+### 14.5 推断他们为何没走最优解（按概率排序）
+
+| # | 推断 | 概率 | 论据 |
+|---|---|---|---|
+| 1 | **团队技术栈匹配**：WSE-Lab 是 Java + Web 背景，**不是 TypeScript / Node.js / VS Code 扩展生态原生**。LSP4J（Java 版 LSP server 库）虽然存在但社区活跃度远低于 [vscode-languageserver-node][^lsp-spec-13]；写 Vue SPA 反而更顺手 | P>70% | 后端 Spring Boot Java + 前端 Vue 都是国内 Java 团队的标准组合 |
+| 2 | **showcase 压倒工程经济性**：理由 1+2+3+6（§14.2）加起来在学术圈是天大的事，工程冗余在学术圈是次级问题——研究者优化的是"被引用的可见度"不是"代码行数" | P>70% | 平台公开部署 + 论文公开发布 + 公众号品牌占位皆指向同一优先级 |
+| 3 | **Pilot Java 包装路径成本最低**：Pilot 是 Java + Eclipse；用 Spring Boot 包一层 REST 比用 LSP4J 写 LSP server 在 Java 工程师视角下**更顺**——尽管 LSP 才是正确答案 | P 40–70% | §6 取证：响应 JSON 与 Pilot Element 序列化一致 |
+| 4 | **可能没意识到 Theia 路径**：Theia / Gitpod / Eclipse Che 这条**国内用得少**，团队若没人提就会自动走 Vue + Spring 这条最熟悉的路 | P 40–70% | docs/04 / docs/06 中也确实未把 Theia 列为主流 SysML v2 IDE 路径 |
+
+### 14.6 最终判定：取决于"目标用户究竟是谁"
+
+| 评估维度 | ModelCopilot Web SPA | LSP + VS Code 扩展 + Theia Web demo |
+|---|---|---|
+| 工程量 | **~7000 行 Vue + 2000 行 Java + 部署运维** | **~500 行 LSP + 200 行 ext + Theia 复用** |
+| 用户上手成本 | URL + 账号（**0 安装**） | 装 VS Code 10 分钟 / 或 Theia URL 同样 0 安装 |
+| Showcase 价值 | **极高**（自有 logo / URL） | 中（marketplace 列表 + Theia 可定制 banner） |
+| 工程师生产力 | 低（无 Git / 无终端 / 无补全 / 无快捷键） | **极高**（VS Code 全套） |
+| 维护负担 | **高**（前后端 + DB + 部署 + crypto.randomUUID 类边角问题） | 低（基础设施由 Microsoft / Eclipse 负担） |
+| AI 集成空间 | **完全自定义**（但要从零做） | 受 LSP 协议约束但能复用 Cursor / Windsurf 等 AI IDE |
+| 中国自主可控叙事 | **强** | 弱（依赖微软） |
+| PSUM 视觉营销 | **强**（左栏 tab） | 中（VS Code 侧栏 panel 同样可做） |
+
+**判定**：
+
+- 如果 ModelCopilot 的目标是 **"做工程师每天打开的 IDE"**——他们错了，应该走 LSP + VS Code 路。当前 build 在工程师视角下**任何独立开发者都会觉得不堪用**：无终端、无 Git、无补全、无快捷键、文件树半残、crypto.randomUUID 在裸 HTTP 上崩溃。
+
+- 如果目标是 **"做学术 showcase + 中国 MBSE 标准参考实现 + AI Copilot 概念预占地"**——他们是对的，自研 Web SPA 给了他们品牌、UI 控制权、政治正确性、未来 AI 接入的实验空间。**实际竞争对手不是 Sensmetry SysIDE，而是 Loughborough 路线图论文[^mbse-copilot-loughborough-13]**——后者**根本没有代码**。比这个标准，ModelCopilot 远超。
+
+- 但**最优解是他们没走的混合路径**（§14.4 Theia 三件套）：**LSP（给所有 IDE）+ VS Code 扩展（给工程师）+ Theia Web demo（给 showcase）+ PSUM LSP 扩展协议（给差异化）**——同时满足学术 showcase 和工程经济性，对 AI 接入更开放。这才是当前架构的真正机会成本。
+
+**预测信号**：如果 2026 H2 真的接通 AI Copilot（§13.3 中期路线图 P 40-70%），他们会发现 **AI 在 VS Code / Cursor / Windsurf 这种已有十几个 AI 入口的工具里已经拥挤**——届时做 LSP 的决策会被重新逼到面前。**如果 2027 年开始转向 LSP + VS Code 扩展路径，等于默认承认架构走错了一道**。
+
+> **附注（学术诚实）**：本章节是基于公开 alpha 平台的外部观察推断。WSE-Lab 内部可能有本节未考虑到的考量（如 NSFC 项目验收对"自主开发"的硬性要求、Pilot LGPL-3.0 + LSP4J 集成的法律审查复杂度、团队 bandwidth 在 PSUM / 量子 / LLM 三线投入下的余量等）。本章节仅作为外部综述视角的架构反思，不构成对 WSE-Lab 团队技术决策合理性的判断。
+
+## 15 与本仓其他章节的交叉引用
 
 - **docs/03-beihang-investigation §2.7** — WSE-Lab 团队画像 + 8 个仓库总览
 - **docs/04-parsing-ide-infrastructure §1** — OMG Pilot Implementation 解析能力（与本平台的渲染管线高度同源）
@@ -993,3 +1103,23 @@ AI Copilot 是这条赛道**所有玩家都看到但谁都没有真正落地**�
 [^almeida-2024-13]: Almeida 等. *An Analysis of the Semantic Foundation of KerML and SysML v2*. ER 2024. 完整书目见 [references.md](references.md#almeida-2024-kerml)。
 
 [^mbse-copilot-loughborough-13]: Loughborough 大学. *MBSE Co-Pilot: A Research Roadmap*. INCOSE *Systems Engineering* 2026, DOI 10.1002/sys.70011（vision-only 路线图论文，**与本平台同名同题但完全无关**）。完整书目见 [references.md](references.md#mbse-copilot-loughborough)。
+
+[^lsp-spec-13]: Microsoft. *Language Server Protocol Specification*. 2026 年语言工具链交付的事实标准协议。完整书目见 [references.md](references.md#lsp-spec)。
+
+[^theia-platform-13]: Eclipse Foundation. *Theia — Cloud & Desktop IDE Platform*. 同时支持 Web 和桌面部署，可直接复用 VS Code 扩展生态。完整书目见 [references.md](references.md#theia-platform)。
+
+[^gitpod-coder-13]: Gitpod / Coder / GitHub Codespaces — 三家主流"浏览器里跑 VS Code"的云 IDE 服务，底层依赖 VS Code Server 或 code-server。完整书目见 [references.md](references.md#gitpod-coder)。
+
+[^vendor-cursor-13]: Cursor (Anysphere). *Cursor — The AI Code Editor*. VS Code fork，专注 AI 辅助编程。完整书目见 [references.md](references.md#vendor-cursor)。
+
+[^vendor-windsurf-13]: Codeium. *Windsurf Editor*. AI 原生编辑器。完整书目见 [references.md](references.md#vendor-windsurf)。
+
+[^vscode-syside-13]: Sensmetry. *Syside (formerly SysIDE) for VS Code*. VS Code marketplace 安装量 4254（2026-05 采样）。完整书目见 [references.md](references.md#vscode-syside)。
+
+[^repo-daltskin-grammar-13]: daltskin. *sysml-v2-grammar*. ANTLR4 文法仓库。完整书目见 [references.md](references.md#repo-daltskin-grammar)。
+
+[^repo-daltskin-lsp-13]: daltskin. *sysml-v2-lsp*. 配套的 LSP server 实现。完整书目见 [references.md](references.md#repo-daltskin-lsp)。
+
+[^repo-daltskin-vscode-13]: daltskin. *sysml-v2-vscode*. 配套的 VS Code 扩展。完整书目见 [references.md](references.md#repo-daltskin-vscode)。
+
+[^repo-syson-13]: Eclipse Foundation. *SysON*. v2026.3.0（2026-05 发布）。完整书目见 [references.md](references.md#repo-syson)。
